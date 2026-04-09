@@ -42,10 +42,8 @@ tools: [read, edit, search]
 using StackExchange.Redis;
 using System.Text.Json;
 
-public class RedisManager
-{
-    private static readonly Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
-    {
+public class RedisManager {
+    private static readonly Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() => {
         var connStr = "127.0.0.1:6379,password=yourpwd,defaultDatabase=0";
         var options = ConfigurationOptions.Parse(connStr);
         // options.ReconnectRetryPolicy = new LinearRetry(5000);
@@ -62,15 +60,13 @@ public class RedisManager
 
 ```csharp
 // 写入带有过期时间的缓存
-public async Task SetCacheAsync<T>(string key, T data, TimeSpan? expiry = null)
-{
+public async Task SetCacheAsync<T>(string key, T data, TimeSpan? expiry = null) {
     var json = JsonSerializer.Serialize(data);
     await RedisManager.Db.StringSetAsync(key, json, expiry);
 }
 
 // 读取缓存
-public async Task<T?> GetCacheAsync<T>(string key)
-{
+public async Task<T?> GetCacheAsync<T>(string key) {
     var val = await RedisManager.Db.StringGetAsync(key);
     if (val.IsNullOrEmpty) return default;
     
@@ -78,8 +74,7 @@ public async Task<T?> GetCacheAsync<T>(string key)
 }
 
 // 删除缓存
-public async Task RemoveCacheAsync(string key)
-{
+public async Task RemoveCacheAsync(string key) {
     await RedisManager.Db.KeyDeleteAsync(key);
 }
 ```
@@ -88,8 +83,7 @@ public async Task RemoveCacheAsync(string key)
 
 ```csharp
 // 写入 Hash 字段
-await RedisManager.Db.HashSetAsync("user:1001", new HashEntry[]
-{
+await RedisManager.Db.HashSetAsync("user:1001", new HashEntry[] {
     new HashEntry("Name", "Alice"),
     new HashEntry("Age", "25")
 });
@@ -104,21 +98,17 @@ var allEntries = await RedisManager.Db.HashGetAllAsync("user:1001");
 ### 4. 分布式锁框架
 
 ```csharp
-public async Task<bool> DoWithLockAsync(string lockKey, TimeSpan lockTimeout, Func<Task> action)
-{
+public async Task<bool> DoWithLockAsync(string lockKey, TimeSpan lockTimeout, Func<Task> action) {
     string lockToken = Guid.NewGuid().ToString();
     // 尝试获取锁
     bool acquired = await RedisManager.Db.LockTakeAsync(lockKey, lockToken, lockTimeout);
     
     if (!acquired) return false;
 
-    try
-    {
+    try {
         await action();
         return true;
-    }
-    finally
-    {
+    } finally {
         // 释放锁
         await RedisManager.Db.LockReleaseAsync(lockKey, lockToken);
     }
@@ -133,8 +123,7 @@ var subscriber = RedisManager.Connection.GetSubscriber();
 await subscriber.PublishAsync("channel:match:events", "match_started_101");
 
 // 订阅消息
-await subscriber.SubscribeAsync("channel:match:events", (channel, message) =>
-{
+await subscriber.SubscribeAsync("channel:match:events", (channel, message) => {
     Console.WriteLine($"Received on {channel}: {message}");
 });
 ```
