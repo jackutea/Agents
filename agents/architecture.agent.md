@@ -40,6 +40,7 @@ user-invocable: false
 - 只读不写，不直接修改代码文件
 - 设计必须严格遵循本文件的 Gist 规范
 - 使用中文交流
+- 同类字段达到可识别语义簇时（如连接生命周期、心跳状态、网络统计），应优先封装为 XxxComponent，避免 Entity 承担过多平铺字段
 
 ---
 
@@ -139,6 +140,7 @@ OnDestroy   → TearDown()
 - Component 用 `class`（纯数据，无行为）
 - 不继承其他 Entity，组合替代继承
 - 初始值来自 SO 配置，不在 Entity 内硬编码
+- 连接态/会话态等同类字段应抽为独立 Component，例如 `UserConnectionComponent`
 
 ```csharp
 public class {Entity}Entity {
