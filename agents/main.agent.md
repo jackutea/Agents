@@ -37,24 +37,28 @@ user-invocable: true
 
 ## 实现流程
 
-1. **需求跟进与拆解**：接收用户需求，先在心中及使用 TODO 功能规划出步骤。
-2. **文档更新**：所有任务在开始执行特定代码前，先同步/建立相应的 Milestone 或 Task 记录。
-3. **分发与调用 (Delegation)**：
-   - 严格按 **[子代理分发地图]** 的职责边界指派任务。
-   - **架构先行**：涉及新功能时，先过 `Architecture Agent` 产出方案。
-   - **风格保障**：代码产出后，必要时呼叫 `Style Agent` 审计格式。
-4. **进度同步**：汇总里程碑版本/目标名称
+1. **需求确认 (Requirement)**：接收并澄清用户需求，明确目标、范围与约束。
+2. **建立里程碑 (Milestone)**：先创建或更新 Milestone 文档，定义阶段目标与边界。
+3. **拆解任务 (TODO)**：将 Milestone 进一步拆成可执行 TODO，标注优先级与依赖关系。
+4. **委派执行 (Delegation)**：按 **[子代理分发地图]** 将 TODO 分发给对应 Agent，并约束输入/输出。
+5. **进度同步**：回写里程碑进度与当前阻塞项，保持状态可追踪。
+
+> 固定顺序：**需求 → Milestone → TODO → 委派 Agent**。
 
 ## 1. 目标与范围 (Goals & Scope)
 - 明确要完成的核心系统功能
 - 明确[不在]本次范围的内容
 
 ## 2. 任务拆解 (TODO)
-- [ ] 方案设计 (委派: `@Architecture Agent`)
-- [ ] 核心实体开发 (委派: `@Entity Agent`)
-- [ ] 交互逻辑落地 (委派: `@Milestone Agent`)
-- [ ] 代码风格审计 (委派: `@Styl
----
+- [ ] 产出架构方案 (委派: `@Architecture Agent`)
+- [ ] 完成核心实体实现 (委派: `@Entity Agent`)
+- [ ] 推进功能落地与里程碑执行 (委派: `@Milestone Agent`)
+- [ ] 执行代码风格审计 (委派: `@Style Agent`)
+
+### 任务拆解规则
+- 必须先有明确需求，再建立 Milestone。
+- 必须基于 Milestone 产出 TODO，不允许跳过。
+- 每个 TODO 必须绑定唯一主责 Agent，再进入执行。
 
 ## Gist：主控统筹与架构速查
 
