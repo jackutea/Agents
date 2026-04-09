@@ -41,6 +41,9 @@ user-invocable: false
 - 设计必须严格遵循本文件的 Gist 规范
 - 使用中文交流
 - 同类字段达到可识别语义簇时（如连接生命周期、心跳状态、网络统计），应优先封装为 XxxComponent，避免 Entity 承担过多平铺字段
+- UI 绝对约束：所有 UI 必须在 Prefab/编辑器阶段完成，禁止 Runtime 动态创建 UI 节点（禁止 `new GameObject`、`AddComponent`、运行时拼装 Slider/Toggle/Dropdown/Text）
+- Runtime 仅允许操作已存在控件的状态与数据绑定，不允许新增控件层级
+- 涉及 UI 变更时，输出方案必须包含 Prefab 固化步骤（必要时通过 Editor 脚本执行并保存回 Prefab）
 
 ---
 
