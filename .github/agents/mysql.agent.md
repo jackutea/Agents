@@ -21,7 +21,7 @@ tools: [read, edit, search]
     - FreeSql 初始化与连接配置
     - DatabaseManager（建库 + 建表）
     - Table 类（含 FreeSql Attribute）
-   - Repository 接口 + 实现
+   - Repository 实现
 4. 确认生成结果满足需求
 
 ## 约束
@@ -56,15 +56,13 @@ var fsql = new FreeSqlBuilder()
 ### 2. DatabaseManager（建库 + 建表）
 
 ```csharp
-public class DatabaseManager
-{
+public class DatabaseManager {
     public IFreeSql Fsql { get; }
 
     private readonly string _serverConnStr;
 
     /// <param name="connStr">含 Database= 的完整连接串</param>
-    public DatabaseManager(string connStr)
-    {
+    public DatabaseManager(string connStr) {
         Fsql = new FreeSqlBuilder()
             .UseConnectionString(DataType.MySql, connStr)
             .UseAutoSyncStructure(false)
@@ -75,8 +73,7 @@ public class DatabaseManager
     }
 
     /// <summary>若数据库不存在则创建</summary>
-    public async Task CreateDatabaseIfNotExistsAsync(string dbName)
-    {
+    public async Task CreateDatabaseIfNotExistsAsync(string dbName) {
         using var tmpFsql = new FreeSqlBuilder()
             .UseConnectionString(DataType.MySql, _serverConnStr)
             .Build();
@@ -90,8 +87,7 @@ public class DatabaseManager
         Fsql.CodeFirst.SyncStructure<TTable>();
 
     /// <summary>同步当前程序集内所有标注了 [Table] 的类</summary>
-    public void SyncAllTables()
-    {
+    public void SyncAllTables() {
         var tableTypes = Assembly.GetExecutingAssembly()
             .GetTypes()
             .Where(t => t.GetCustomAttribute<TableAttribute>() != null)
@@ -112,8 +108,7 @@ public class DatabaseManager
 using FreeSql.DataAnnotations;
 
 [Table(Name = "{TableName}")]
-public class {Table}
-{
+public class {Table} {
     [Column(IsPrimary = true, IsIdentity = true)]
     public long Id { get; set; }
 
@@ -131,28 +126,13 @@ public class {Table}
 }
 ```
 
-#### 3b. Repository 接口
+#### 3b. Repository 实现（FreeSql 泛型 Repository）
 
 ```csharp
-public interface I{Table}Repository
-{
-    Task<{Table}?> GetByIdAsync(long id);
-    Task<List<{Table}>> GetAllAsync();
-    Task<{Table}> CreateAsync({Table} table);
-    Task UpdateAsync({Table} table);
-    Task DeleteAsync(long id);
-}
-```
-
-#### 3c. Repository 实现（FreeSql 泛型 Repository）
-
-```csharp
-public class {Table}Repository : I{Table}Repository
-{
+public class {Table}Repository {
     private readonly IBaseRepository<{Table}, long> _repo;
 
-    public {Table}Repository(IFreeSql fsql)
-    {
+    public {Table}Repository(IFreeSql fsql) {
         _repo = fsql.GetRepository<{Table}, long>();
     }
 
@@ -162,8 +142,7 @@ public class {Table}Repository : I{Table}Repository
     public Task<List<{Table}>> GetAllAsync() =>
         _repo.Select.ToListAsync();
 
-    public async Task<{Table}> CreateAsync({Table} table)
-    {
+    public async Task<{Table}> CreateAsync({Table} table) {
         await _repo.InsertAsync(table);
         return table;
     }
