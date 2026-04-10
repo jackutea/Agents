@@ -45,6 +45,7 @@ NetworkServer：封装 Telepathy.Server，Init/Start/Stop/Tick/Send/BindMessageH
 - 禁改 Telepathy/
 - 只用 BinaryPrimitives
 - 网络回调只在 Tick 主线程触发
+- C# 网络相关代码必须兼容 netstandard2.1
 - 只用中文
 
 ## Gist：网络消息命名速查
