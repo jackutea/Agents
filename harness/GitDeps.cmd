@@ -20,7 +20,7 @@ set "LOCAL_REPO_DIR=%~2"
 set "SOURCE_SUBDIR=%~3"
 set "TARGET_DIR=%~4"
 set "LOCAL_GIT_POLICY=%~5"
-if "%LOCAL_GIT_POLICY%"=="" set "LOCAL_GIT_POLICY=remove"
+if "%LOCAL_GIT_POLICY%"=="" set "LOCAL_GIT_POLICY=keep"
 set "LOCAL_SRC_DIR=%LOCAL_REPO_DIR%\%SOURCE_SUBDIR%"
 
 if "%SOURCE_SUBDIR:~0,1%"=="\" (

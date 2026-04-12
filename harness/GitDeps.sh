@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   echo "[GitDeps] Usage: GitDeps.sh <REPO_URL> <LOCAL_REPO_DIR> <SOURCE_SUBDIR> <TARGET_DIR> [LOCAL_GIT_POLICY]"
-  echo "[GitDeps] LOCAL_GIT_POLICY: remove (default) | keep"
+  echo "[GitDeps] LOCAL_GIT_POLICY: remove | keep (default)"
   echo "[GitDeps] This is a generic core script used by higher-level wrappers."
 }
 
@@ -23,7 +23,7 @@ REPO_URL="${1:?missing REPO_URL}"
 LOCAL_REPO_DIR="${2:?missing LOCAL_REPO_DIR}"
 SOURCE_SUBDIR="${3:?missing SOURCE_SUBDIR}"
 TARGET_DIR="${4:?missing TARGET_DIR}"
-LOCAL_GIT_POLICY="${5:-remove}"
+LOCAL_GIT_POLICY="${5:-keep}"
 
 if [ "${LOCAL_GIT_POLICY}" != "remove" ] && [ "${LOCAL_GIT_POLICY}" != "keep" ]; then
   echo "[GitDeps] Error: LOCAL_GIT_POLICY must be 'remove' or 'keep', got: ${LOCAL_GIT_POLICY}"
