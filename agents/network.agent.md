@@ -33,7 +33,8 @@ IMessage：MessageId/BodyType/WriteTo/ReadFrom/Reset
 
 消息注册：
 - MessageConst 新增常量
-- 新建 {Name}Message.cs 实现 IMessage
+- Message 命名方式：`xxMessage_Req` 表示客户端发给服务端；`xxMessage_Res` 表示服务端单发给客户端；`xxMessage_Broad` 表示服务端群发给客户端
+- 新建消息文件时按上述后缀命名并实现 IMessage
 - MessagePool 注册工厂，BindMessageHandler 绑定处理器
 
 MessagePool：Dictionary<ushort, Queue<IMessage>>，Rent/Return，避免 GC
@@ -44,4 +45,24 @@ NetworkServer：封装 Telepathy.Server，Init/Start/Stop/Tick/Send/BindMessageH
 - 禁改 Telepathy/
 - 只用 BinaryPrimitives
 - 网络回调只在 Tick 主线程触发
+- C# 网络相关代码必须兼容 netstandard2.1
 - 只用中文
+
+## Gist：网络消息命名速查
+
+### 1. Message 命名规则
+- `xxMessage_Req`：客户端 -> 服务端
+- `xxMessage_Res`：服务端 -> 单客户端
+- `xxMessage_Broad`：服务端 -> 多客户端（群发）
+
+### 2. 新增消息最小改动清单
+1. 在 `MessageConst` 增加对应常量（建议后缀同步：`_REQ` / `_RES` / `_BROAD`）
+2. 新建 `xxMessage_Req.cs` / `xxMessage_Res.cs` / `xxMessage_Broad.cs` 并实现 `IMessage`
+3. 在 `MessagePool.Register<T>` 注册工厂
+4. 在 `NetworkServer.BindMessageHandler<T>` 绑定处理（仅接收方向需要）
+5. 发送侧按语义调用：单发用 `Send(connectionId, msg)`，群发循环调用 `Send`
+
+### 3. 命名示例
+- 客户端发起心跳请求到服务端：`PingMessage_Req`
+- 服务端给单个客户端确认：`LoginMessage_Res`
+- 服务端心跳响应给客户端：`PongMessage_Res`
