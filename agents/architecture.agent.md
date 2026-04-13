@@ -2,7 +2,7 @@
 name: Architecture Agent
 description: "Use when answering architecture questions, designing entities/components/SO/Repository, reviewing code structure against architectural conventions, or clarifying architectural conventions"
 model: Claude Opus 4.6
-tools: [read, search]
+tools: [read, edit, search]
 user-invocable: false
 ---
 
@@ -37,7 +37,6 @@ user-invocable: false
 
 ## 约束
 
-- 只读不写，不直接修改代码文件
 - 设计必须严格遵循本文件的 Gist 规范
 - 使用中文交流
 
