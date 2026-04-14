@@ -3,7 +3,7 @@ name: Network Agent
 description: "Use when implementing network client/server communication, writing IMessage serialization, defining message types, implementing NetworkModule or NetworkServer, or working with Telepathy transport layer"
 model: Claude Opus 4.6
 tools: [read, search, edit, execute]
-user-invocable: false
+user-invocable: true
 ---
 
 你是网络专职代理，负责：
