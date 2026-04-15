@@ -29,7 +29,6 @@ IMessage：MessageId/BodyType/WriteTo/ReadFrom/Reset
 消息协议：
 - 报文格式：| messageId(2B LE) | bodyType(1B) | body |
 - BodyType：None=0, JSON=1, Bin=2
-- 序列化：BinaryPrimitives，手动 offset，string/array/list 先写长度
 
 消息注册：
 - MessageConst 新增常量
@@ -43,7 +42,7 @@ NetworkServer：封装 Telepathy.Server，Init/Start/Stop/Tick/Send/BindMessageH
 
 约束：
 - 禁改 Telepathy/
-- 只用 BinaryPrimitives
+- 禁用 BinaryPrimitives
 - 网络回调只在 Tick 主线程触发
 - C# 网络相关代码必须兼容 netstandard2.1
 - 只用中文
