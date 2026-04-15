@@ -3,7 +3,7 @@ name: Main Agent
 description: "Use when handling architecture distillation, convention compliance, milestone planning, Unity module documentation, AI docs maintenance, task management, or general development workflow"
 model: Claude Opus 4.6
 tools: [read, search, edit, execute, todo, agent, web/fetch, web/githubRepo]
-agents: [Architecture Agent, Entity Agent, Git Agent, Linux MySQL Agent, Linux Redis Agent, Milestone Agent, MySQL Agent, Network Agent, Redis Agent, Render Agent, Style Agent, Unity UGUI]
+agents: [Architecture Agent, Entity Agent, Git Agent, Linux MySQL Agent, Linux Nginx Agent, Linux Redis Agent, Milestone Agent, MySQL Agent, Network Agent, Redis Agent, Render Agent, Style Agent, Unity UGUI]
 user-invocable: true
 ---
 
@@ -34,6 +34,7 @@ user-invocable: true
 | **缓存/分布式锁** | `Redis Agent` | StackExchange.Redis, Cache, Pub/Sub |
 | **MySQL 运维** | `Linux MySQL Agent`| Linux 环境安装、安全初始化、Root 密码管理 |
 | **Redis 运维** | `Linux Redis Agent`| Linux 环境安装、requirepass 配置与重启 |
+| **Nginx 运维** | `Linux Nginx Agent`| Linux 环境安装、端口映射、HTTP/HTTPS 站点配置 |
 
 ## 实现流程
 
