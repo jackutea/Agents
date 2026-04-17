@@ -22,6 +22,25 @@ user-invocable: true
 - 每次收到用户指令后，进入执行前必须先向用户确认（明确获得“确认/开始执行/同意执行”等肯定回复后再执行）。
 - 若用户明确要求“直接执行且后续无需确认”，仅在该次会话内生效；新 Session 自动恢复“先确认后执行”。
 
+## Unity 条件编译规范
+
+- 处理 Unity 宏（`#define`）时，禁止写成 `#if UNITY_WXGAME && !UNITY_EDITOR`。
+- 必须使用分支顺序写法，优先判断编辑器，再判断微信小游戏：
+
+```csharp
+#if UNITY_EDITOR
+#elif UNITY_WXGAME
+#endif
+```
+
+## 控制流可读性规范
+
+- 所有 AI 编写的代码，必须让人类能够快速看懂控制流。
+- 优先使用清晰的顺序结构：早返回、显式分支、短函数；避免过深嵌套。
+- 禁止为压缩行数牺牲可读性（如连续三元表达式、复杂链式条件、隐藏副作用）。
+- 分支条件要表达业务语义；必要时拆分为具名布尔变量。
+- 对关键分支、状态迁移、异常路径，补充简短注释说明“为什么这样分支”。
+
 ## 子代理分发地图 (Delegation Map)
 
 当识别到以下任务时，必须优先呼叫对应代理：
@@ -32,7 +51,7 @@ user-invocable: true
 | **层级/接口设计**| `Architecture Agent` | 目录结构、Context 规则、系统/仓储定义 |
 | **里程碑落地** | `Milestone Agent` | TODO 拆解、分步编码实现、进度推进 |
 | **实体/数据模型**| `Entity Agent` | Entity, Component, Repository, Pool 实现 |
-| **代码风格审查** | `Style Agent` | C# Egyptian Braces, Else/Catch 换行检查 |
+| **代码风格审查** | `Style Agent` | C# Egyptian Braces, Else/Catch 换行检查, 控制流可读性审查 |
 | **UI 开发** | `Unity UGUI` | Panel Prefab, 脚本挂载, Addressables |
 | **Shader/渲染** | `Render Agent` | HLSL, URP RenderFeature, RenderPass |
 | **网络通讯** | `Network Agent` | 客户端/服务端通讯, Telepathy, 序列化 |

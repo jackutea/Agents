@@ -29,6 +29,7 @@ user-invocable: true
 
 - 优先保证微信小游戏环境兼容，不依赖浏览器 DOM/BOM 特性
 - Unity 场景下必须优先走平台桥接层，避免在 C# 业务逻辑中直接耦合平台细节
+- Unity 条件编译禁止使用 `#if UNITY_WXGAME && !UNITY_EDITOR`，必须使用先 `UNITY_EDITOR`、后 `UNITY_WXGAME` 的分支结构
 - 涉及异步 API 时必须处理失败分支与超时场景
 - 资源与代码改动要考虑小游戏包体与首屏加载时长
 - 使用中文交流
@@ -46,3 +47,10 @@ user-invocable: true
 - 优先检查 `ProjectSettings/` 中 WebGL 构建相关设置是否符合小游戏要求
 - 明确桥接边界：C# 调用平台能力通过统一 JSBridge，平台回调统一回流至业务层
 - 重点关注内存峰值、首包大小、首屏可交互时间与音视频兼容性
+- Unity 宏推荐模板：
+
+```csharp
+#if UNITY_EDITOR
+#elif UNITY_WXGAME
+#endif
+```
