@@ -39,6 +39,7 @@ user-invocable: false
 
 - 设计必须严格遵循本文件的 Gist 规范
 - 使用中文交流
+- 当某个对象在时序上已被严格保证非空时，函数内不需要重复判空；仅在边界输入或时序不确定处进行判空防御
 - 同类字段达到可识别语义簇时（如连接生命周期、心跳状态、网络统计），应优先封装为 XxxComponent，避免 Entity 承担过多平铺字段
 - UI 绝对约束：所有 UI 必须在 Prefab/编辑器阶段完成，禁止 Runtime 动态创建 UI 节点（禁止 `new GameObject`、`AddComponent`、运行时拼装 Slider/Toggle/Dropdown/Text）
 - Runtime 仅允许操作已存在控件的状态与数据绑定，不允许新增控件层级
