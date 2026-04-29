@@ -41,6 +41,7 @@ user-invocable: false
 - 使用中文交流
 - 控制流必须保持顺序分层，由上层调用下层；仅 Controller 属于特例，允许 Controller 之间互相调用
 - 依赖关系必须保持顺序分层，由上层依赖下层；下层禁止反向感知上层，尤其 Entity / Component / SO / Repository 等低层类型禁止知道 Context 的存在，更不允许传入 Context 实例
+- 平台裁剪必须按目标端决定：若制作 PC 端项目，不需要分离 Launcher / HotReload 热更工程，也不需要 OSS 下载流程；可将运行时逻辑直接放在常规 Runtime 程序集中
 - 当某个对象在时序上已被严格保证非空时，函数内不需要重复判空；仅在边界输入或时序不确定处进行判空防御
 - 同类字段达到可识别语义簇时（如连接生命周期、心跳状态、网络统计），应优先封装为 XxxComponent，避免 Entity 承担过多平铺字段
 - UI 绝对约束：所有 UI 必须在 Prefab/编辑器阶段完成，禁止 Runtime 动态创建 UI 节点（禁止 `new GameObject`、`AddComponent`、运行时拼装 Slider/Toggle/Dropdown/Text）
@@ -48,6 +49,87 @@ user-invocable: false
 - 涉及 UI 变更时，输出方案必须包含 Prefab 固化步骤（必要时通过 Editor 脚本执行并保存回 Prefab）
 
 ---
+
+## 架构总览
+
+Unity 运行时架构按目标端选择入口形态。需要热更或远端资源目录时，可拆分 `Launcher` 与 `HotReload`：`Launcher` 负责 AOT 引导、资源目录与热更 DLL 加载，核心游戏逻辑集中在 `HotReload`；不需要热更时，运行时逻辑直接放在常规 Runtime 程序集中。
+
+入口启动后，由 `ClientMain` 创建唯一 `GameContext`，再将 SystemState、SystemEvents、Module、Manager、Service、Repository、Pool、全局 Entity 与必要引擎对象注入 Context。热更拆分只适用于需要小程序/WebGL 资源下载、热更 DLL 或远端资源目录的目标端；若制作 PC 端项目，不需要拆出热更工程，不需要通过 OSS 下载 DLL 或资源 manifest。无论采用哪种入口形态，都保留 System / Controller / Entity / Repository / Module / Manager 的逻辑分层。
+
+运行期控制流按 `ClientMain -> System -> Controller -> Entity/Repository/Module/Manager` 顺序推进。`System` 负责系统级编排和生命周期，`Controller` 负责无状态控制逻辑，复杂行为可下沉到 Domain；`Entity + Component` 只承载数据，初始内容来自 SO/TM 配置，持久化结构放 Save Model，查询访问由 Repository 统一管理。
+
+依赖方向保持单向：高层可以依赖低层，低层不能反向感知高层。`GameContext` 是上层编排用上下文，允许传入 System/Controller/Manager 等上层控制对象，但禁止继续下传给 Entity、Component、SO、Repository 等纯数据或数据访问层。跨系统通信通过 Context 中显式声明的 `SystemEvents` 完成，不使用通用消息总线。
+
+编辑期与运行期严格分离：`Src_Editor` 中的 EM/编辑器工具负责把可视化编辑数据转换并写回 SO、Prefab 或 Addressables；Runtime 只读取固化后的配置和 Prefab 控件状态，不动态创建 UI 层级。
+
+### 架构图
+
+#### 入口与程序集
+
+```text
+Launcher       AOT 引导 / 远端目录 / Addressables / 动态加载 HotReload
+HotReload      核心游戏逻辑
+PC Runtime     常规运行时程序集，不拆热更工程
+Editor         EM / Prefab / SO / Addressables 编辑工具
+Tests          单元测试与集成测试
+
+Editor -> SO / TM / Prefab / Addressables 配置
+SO / TM / Prefab / Addressables 配置 -> HotReload   运行期读取
+SO / TM / Prefab / Addressables 配置 -> PC Runtime  本地读取
+```
+
+| 目标端形态 | 启动路径 | 资源/配置路径 |
+|---|---|---|
+| 热更或远端资源目录 | `Launcher -> HotReload` | `Launcher` 加载目录与热更 DLL，`HotReload` 读取固化后的 SO/TM/Prefab/AA 配置 |
+| PC 或无热更项目 | `PC Runtime` | 常规 Runtime 程序集直接读取本地 SO/TM/Prefab 配置 |
+| 编辑期工具 | `Editor` | 只在编辑期转换、生成、写回 SO、Prefab 或 Addressables 配置 |
+
+#### 运行期逻辑分层
+
+```text
+ClientMain -> GameContext          创建并注入唯一上下文
+ClientMain -> Unity Engine 对象     驱动必要引擎对象
+ClientMain -> Systems_{Feature}    驱动系统生命周期
+
+Systems_{Feature} -> {F}System       Init / Tick / FixTick / LateTick
+Systems_{Feature} -> {F}SystemState  系统 FSM 状态
+Systems_{Feature} -> {F}SystemEvents 逐事件 Action
+
+{F}System -> Controllers             静态无状态控制
+
+Controllers -> Domain                         复杂行为逻辑
+Controllers -> Manager_{Feature} -> Modules   业务服务调用基础设施能力
+Controllers -> Modules_{Feature} -> Engine    引擎/平台/网络/资源能力
+Controllers -> Services                       ID、存档等通用服务
+Controllers -> Repository -> Entity+Component UniqueID 主索引与查询访问
+Controllers -> Pool       -> Entity+Component 复用对象
+Controllers -> SO/TM      -> Entity+Component 不可变配置模板
+```
+
+#### GameContext 持有对象
+
+```text
+GameContext -> SystemState
+GameContext -> SystemEvents
+GameContext -> Manager_{Feature}
+GameContext -> Modules_{Feature}
+GameContext -> Services
+GameContext -> Repository
+GameContext -> Pool
+GameContext -> 全局 Entity
+GameContext -> 必要 Unity Engine 对象
+```
+
+#### 依赖与通信边界
+
+| 关系 | 规则 |
+|---|---|
+| 主流程 | `ClientMain -> System -> Controller -> Entity/Repository/Module/Manager` |
+| 依赖方向 | 高层依赖低层；低层禁止反向感知高层 |
+| Context 边界 | `GameContext` 只用于上层编排，可传入 System/Controller/Manager；禁止传入 Entity、Component、SO、Repository |
+| 跨系统通信 | 通过 `SystemEvents` 中显式声明的逐事件 `Action` 完成 |
+| Controller 横向编排 | 仅 Controller 之间允许相互调用；其他层级仍保持单向依赖 |
+| 编辑期/运行期 | Editor 写回固化资产；Runtime 只读取资产与操作已存在控件状态 |
 
 ## Gist：架构实现速查
 
@@ -78,11 +160,12 @@ Assets/
 |---|---|---|
 | **Launcher** | AOT 引导；下载并执行热更 DLL | → Common |
 | **HotReload** | 核心游戏逻辑（System/Controller/Manager/Module） | → Common |
+| **PC Runtime** | PC 端常规运行时；不拆热更工程，不走 OSS 下载 | → Common |
 | **Common** | 枚举、常量、接口、工具函数 | — |
 | **Editor** | 编辑器工具（仅 `UNITY_EDITOR`） | → Common |
 | **Tests** | 单元/集成测试 | → Common, HotReload |
 
-> Launcher 与 HotReload 不直接引用，通过 Addressables 动态加载解耦。
+> Launcher 与 HotReload 不直接引用，通过 Addressables 动态加载解耦。PC 端项目不需要该拆分，可直接使用常规 Runtime 程序集承载游戏逻辑。
 
 ### 调用流与依赖方向
 
