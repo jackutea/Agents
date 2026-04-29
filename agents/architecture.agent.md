@@ -39,6 +39,8 @@ user-invocable: false
 
 - 设计必须严格遵循本文件的 Gist 规范
 - 使用中文交流
+- 控制流必须保持顺序分层，由上层调用下层；仅 Controller 属于特例，允许 Controller 之间互相调用
+- 依赖关系必须保持顺序分层，由上层依赖下层；下层禁止反向感知上层，尤其 Entity / Component / SO / Repository 等低层类型禁止知道 Context 的存在，更不允许传入 Context 实例
 - 当某个对象在时序上已被严格保证非空时，函数内不需要重复判空；仅在边界输入或时序不确定处进行判空防御
 - 同类字段达到可识别语义簇时（如连接生命周期、心跳状态、网络统计），应优先封装为 XxxComponent，避免 Entity 承担过多平铺字段
 - UI 绝对约束：所有 UI 必须在 Prefab/编辑器阶段完成，禁止 Runtime 动态创建 UI 节点（禁止 `new GameObject`、`AddComponent`、运行时拼装 Slider/Toggle/Dropdown/Text）
@@ -82,6 +84,13 @@ Assets/
 
 > Launcher 与 HotReload 不直接引用，通过 Addressables 动态加载解耦。
 
+### 调用流与依赖方向
+
+- 调用流必须顺序向下：上层负责编排并调用下层，下层不得反向驱动上层控制流
+- 依赖关系必须顺序向下：高层可以依赖低层，低层不得依赖高层
+- 唯一特例是 Controller：允许 Controller 之间互相调用，用于串联控制流程；但 Controller 仍不得把高层依赖倒灌给 Entity / Component / SO / Repository
+- 任何低层对象都不得感知 `GameContext`；尤其禁止在 Entity / Component / SO / Repository 的字段、构造函数、方法参数中传入 `GameContext`
+
 ### Context 规则
 
 ```csharp
@@ -100,6 +109,8 @@ public class GameContext {
 ```
 
 字段命名：`state_*` / `events_*` / `*Module` / `*Manager` / `*Repository` / `*Entity`。
+
+`GameContext` 只属于编排层入口与上层控制代码，不向 Entity / Component / SO / Repository 下传。
 
 ### 主循环
 
@@ -125,6 +136,8 @@ OnDestroy   → TearDown()
 - `Spawn(ctx, so)` → 创建 Entity、分配 ID、存入 Repository、从 SO 赋值、触发 OnSpawn
 - `Unspawn(ctx, entity)` → 触发 OnUnspawn、移出 Repository、归还对象池
 - `Tick(ctx, entity, dt)` → 每帧更新
+- 允许 Controller 之间互相调用，以保持顺序控制流编排；这是唯一允许的横向协作特例
+- Controller 可以持有并传递 `ctx` 给上层控制对象，但不得把 `ctx` 继续传入 Entity / Component / SO / Repository
 - 只做**控制**（"让谁来"）；简单行为直接在 Controller 内新增函数，复杂时才抽出独立 Controller
 
 ### 签名类型（Common/ 层）
@@ -143,6 +156,7 @@ OnDestroy   → TearDown()
 - Component 用 `class`（纯数据，无行为）
 - 不继承其他 Entity，组合替代继承
 - 初始值来自 SO 配置，不在 Entity 内硬编码
+- Entity / Component 属于低层纯数据对象，不得依赖或感知 `GameContext`，也不得接收 `GameContext` 作为参数
 - 连接态/会话态等同类字段应抽为独立 Component，例如 `UserConnectionComponent`
 
 ```csharp
@@ -172,6 +186,7 @@ public class {Entity}Entity {
 - 主索引 `Dictionary<UniqueID, {Entity}Entity> byID`
 - 附加索引按查询需求添加（如 `byTypeID`）
 - 接口约定：`Add` / `TryGet` / `TryGetByXxx` / `TakeAll` / `Remove`
+- Repository 属于下层数据访问抽象，不得依赖 `GameContext`，也不得要求调用方传入 `GameContext`
 
 ### Module vs Manager
 
