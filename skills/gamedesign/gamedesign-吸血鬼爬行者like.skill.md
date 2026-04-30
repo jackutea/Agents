@@ -472,6 +472,71 @@ public class CombatSystem {
 
 _完成“技术细节”后提交，下一步为“# 美术资源需求”。_
 
+# 美术资源需求（Art & Assets）
+本节为美术提供详细的交付规格表与命名规范，确保程序能直接使用贴图、动画与 VFX。
+
+## 总体风格与色彩
+- 风格：哥特暗黑 + 手绘质感（高对比，强调光影）。
+- 主色板建议：
+	- 主色：#5B0E0E（血红深色）
+	- 辅色：#111218（近黑）
+	- 高光：#EFA7A7（淡血光）
+	- 次要：#6B828C（冷灰）
+
+## 导出与技术要求
+- 文件格式：
+	- 精灵/贴图：PNG（支持透明），PSD 源文件归档保存
+	- UI 图标：PNG 64/128/256 像素三套
+	- VFX：SpriteSheet 或 Particle Texture（PNG）+ optional normal map (PNG)
+	- 音频：WAV（开发）/OGG（发布）
+- Unity PPU（Pixels Per Unit）：建议 100 PPU 为基础，可在团队中统一
+- 命名规范：<type>_<subtype>_<action>_<frame>.<ext>
+	- 例如：char_player_idle_01.png; enemy_vamp_knight_attack_03.png
+
+## 角色与动画（最低产出）
+- 玩家（Player）
+	- 动作集：idle(4), walk(8), run(8), light_attack(6), heavy_attack(8), dash(6), hurt(4), death(8)
+	- Sprite 帧建议：以 8 帧/动作 为起点，部分动作（连击）可用 12–16 帧
+	- 绑定点：root（脚下中心）、weapon_hand（武器挂点）、vfx_attach（特效挂点）
+
+- 敌人（按原型）
+	- Grunt：idle(4), walk(6), attack(6), hurt(3), death(6)
+	- Bat Swarm：flap(6)（使用 tiling + shader 组合呈现群体）
+	- Vampire Knight：idle(4), walk(8), charge(10), heavy_attack(10), hurt(4), death(8)
+
+## 场景与装饰
+- 房间地板/墙面：可瓦片化 TileSet，常用瓦片尺寸 32x32 或 64x64（依据 PPU）
+- 道具/遮挡：分为前景（遮挡玩家）、中景、背景三层
+
+## VFX（特效）
+- 核心特效：
+	- 吸血特效（吸血光束 + 回血粒子）: Sprite Sheet 32–48帧，尺寸 256x256
+	- 攻击冲击：短时泡影 8–12 帧
+	- 技能投射体：带尾迹的粒子图
+- 要求：提供透明 PNG 序列或合并 SpriteSheet，并注释 pivot 与播放帧率（fps）
+
+## UI 资源
+- 图标集：所有技能/物品图标 64x64 PNG，命名为 item_<id>_icon.png
+- HUD 元素：分层 PSD，按钮、边框、按钮按下状态（3 状态）
+
+## 音频（简要）
+- 每个攻击/技能一个短 SFX（0.1–0.6s），每个 Boss 一个主题音乐（loop）
+
+## 交付清单（最小）
+- 玩家占位动画组（见上）
+- 三种普通敌人动画组、两种精英/小 Boss 动画组
+- 房间 TileSet（至少 1 套主题）
+- HUD 图标与主菜单背景 PSD
+- VFX 核心 3 个（吸血、冲击、冲刺）
+
+## 验收标准
+- 所有 PNG/PSD 命名符合规范、帧数与挂点说明齐全；程序可在不改动资源的情况下加载并播放动画。
+
+---
+
+_完成“美术资源需求”后提交，接着撰写“# 内容策划（场景/任务/叙事）”。_
+
+
 
 
 
