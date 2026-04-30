@@ -30,7 +30,7 @@
 | **网络通讯** | `Network Agent` | 客户端/服务端通讯, Telepathy, 序列化 |
 | **微信小游戏开发（原生）** | `WeChat Mini Game Agent` | 原生小游戏工程配置、wx API 接入、分包策略与性能优化 |
 | **微信小游戏开发（Unity 导出）** | `WeChat Mini Game Agent` | Unity WebGL 导出、小游戏转换插件适配、桥接脚本与真机性能调优 |
-| **数据库开发** | `MySQL Agent` | FreeSql ORM, Table 映射, CRUD 逻辑 |
+| **数据库开发** | `MySQL Agent` | ORM/数据库访问层, Table 映射, CRUD 逻辑 |
 | **缓存/分布式锁** | `Redis Agent` | StackExchange.Redis, Cache, Pub/Sub |
 | **MySQL 运维** | `Linux Agent`| Linux 环境安装、安全初始化、Root 密码管理 |
 | **Redis 运维** | `Linux Agent`| Linux 环境安装、requirepass 配置与重启 |
