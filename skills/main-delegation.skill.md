@@ -35,6 +35,7 @@
 | **MySQL 运维** | `Linux Agent`| Linux 环境安装、安全初始化、Root 密码管理 |
 | **Redis 运维** | `Linux Agent`| Linux 环境安装、requirepass 配置与重启 |
 | **Nginx 运维** | `Linux Agent`| Linux 环境安装、端口映射、HTTP/HTTPS 站点配置 |
+| **Windows 本地配置** | `Windows Agent` | 计划任务、DNS、hosts、ssh-key、Path、文件下载、截图 |
 
 ## 并行委派规则 (Parallel Delegation)
 
