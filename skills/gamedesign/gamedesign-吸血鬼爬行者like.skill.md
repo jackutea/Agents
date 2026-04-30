@@ -387,6 +387,92 @@ _写完“敌人/单位设计”后提交，并继续“# 进度与成长”。_
 
 _完成“进度与成长”后提交，下一步写 “# 技术细节”。_
 
+# 技术需求与关键系统详细设计
+本节为程序员提供可直接落地的技术规格、类/模块清单与数据结构样例，便于实现与代码评审。
+
+## 项目结构建议（Unity）
+- Assets/
+	- Scripts/
+		- Core/ (EventBus, Save, Pooling)
+		- Player/ (PlayerController, PlayerCombat)
+		- Enemy/ (AI, EnemyController)
+		- Level/ (RoomTemplate, LevelGenerator)
+		- UI/ (UIManager, HUD)
+		- Data/ (ScriptableObjects, JSON loaders)
+	- Art/
+	- Prefabs/
+
+## 关键类与接口（概要）
+- `IEntity`：ID, Health, ApplyDamage(), OnDeath()
+- `PlayerController`：Move/Attack/Dash/UseSkill
+- `EnemyController`：StateMachine, PerformAttack
+- `CombatSystem`：ResolveHit(hitContext)
+- `LevelGenerator`：Generate(seed)
+- `UIManager`：Register/Unregister events, UpdateHUD
+- `SaveManager`：SaveRunState(), LoadRunState(), SaveMeta(), LoadMeta()
+
+## 事件总线示例（Event Names）
+- OnEnemySpawned(EnemyId, RoomId)
+- OnEnemyKilled(EnemyId, KillerId)
+- OnPlayerDamaged(amount, attackerId)
+- OnItemPicked(itemId)
+
+## 数据结构示例（JSON / ScriptableObject）
+- Skill SO:
+	- id, name, cooldown, cost, prefabRef, tags
+- Enemy JSON:
+	- id, prefabRef, baseHP, aiProfile, lootTable
+
+## 存档格式（示例 JSON）
+```
+RunState: {
+	player: {hp, pos, skills, inventory},
+	currentFloor: 3,
+	seed: 12345,
+	clearedRooms: ["r001","r002"]
+}
+MetaState: {
+	unlockedSkills: ["leech_strike"],
+	shards: 12
+}
+```
+
+## 池化与性能
+- 建议对弹道、VFX、血魂、常驻敌人使用对象池；每类对象预分配 N 个（N 可配置）。
+- 使用 Unity Profiler + 自定义 Telemetry（每帧记录活跃实体数、GC 分配、主要方法耗时）。
+
+## 测试与调试工具
+- 开发命令：spawn_enemy(id), grant_item(id), advance_floor()
+- 日志：统一日志前缀（[Combat], [AI], [Level]）便于追踪
+
+## 推荐第三方库与中间件
+- Addressables（资源管理）、DOTween（动画）、Cinemachine（镜头管理，可选）
+
+## 接口契约示例（C# 风格伪代码）
+```csharp
+public interface IEntity {
+	string Id {get;} int HP {get;}
+	void ApplyDamage(int amount, DamageContext ctx);
+	event Action<IEntity> OnDeath;
+}
+
+public class CombatSystem {
+	public void ResolveHit(HitContext ctx) {
+		var dmg = Calculate(ctx);
+		ctx.Target.ApplyDamage(dmg, ctx.damageContext);
+		if(ctx.Source is Player) OnEnemyHurt?.Invoke(...);
+	}
+}
+```
+
+## 验收标准（技术）
+- 程序实现能在开发机上稳定运行 60fps，且核心模块（Combat/Level/AI）均有单元或集成测试。
+
+---
+
+_完成“技术细节”后提交，下一步为“# 美术资源需求”。_
+
+
 
 
 
