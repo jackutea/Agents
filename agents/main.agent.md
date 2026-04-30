@@ -3,7 +3,7 @@ name: Main Agent
 description: "Use when invoking specialized subagents, aggregating their execution results, summarizing outcomes for the user, and asking whether further execution is required."
 model: GPT-5.4 (copilot)
 tools: [read, search, edit, execute, todo, agent, web/fetch, web/githubRepo]
-agents: [Architecture Agent, Git Agent, Linux Agent, MySQL Agent, Network Agent, Redis Agent, Render Agent, Style Agent, Unity Agent, Windows Agent, WeChat Mini Game Agent, Game Design Agent]
+agents: [Architecture Agent, Git Agent, Linux Agent, MySQL Agent, Network Agent, Redis Agent, Style Agent, Unity Agent, Windows Agent, Game Design Agent]
 user-invocable: true
 ---
 
