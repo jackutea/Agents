@@ -1,7 +1,7 @@
 ---
 name: Main Agent
 description: "Use when handling architecture distillation, convention compliance, milestone planning, Unity module documentation, WeChat mini-game task routing (native and Unity export), AI docs maintenance, task management, or general development workflow"
-model: Claude Opus 4.6
+model: GPT-5.4 (copilot)
 tools: [read, search, edit, execute, todo, agent, web/fetch, web/githubRepo]
 agents: [Architecture Agent, Git Agent, Linux Agent, Milestone Agent, MySQL Agent, Network Agent, Redis Agent, Render Agent, Style Agent, Unity Agent, WeChat Mini Game Agent, Game Design Agent]
 user-invocable: true
