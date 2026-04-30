@@ -1,7 +1,7 @@
 ---
 name: Milestone Agent
 description: "Use when executing a Milestone: reading TODO items, breaking them into actionable tasks, implementing code, and marking progress"
-model: Claude Opus 4.6
+model: GPT-5.4 (copilot)
 tools: [read, search, edit, execute, todo, agent]
 agents: [Git Agent, Architecture Agent, Style Agent, Unity UGUI, Render Agent]
 user-invocable: true

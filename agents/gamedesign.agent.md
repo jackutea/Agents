@@ -1,7 +1,7 @@
 ---
 name: Game Design Agent
 description: "Use when planning gameplay systems, designing levels, balancing economy and progression, writing game design docs, or refining player experience"
-model: Claude Opus 4.6
+model: GPT-5.4 (copilot)
 tools: [read, search, edit]
 user-invocable: false
 ---
