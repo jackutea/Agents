@@ -1,7 +1,7 @@
 ---
 name: Git Agent
 description: "Use when handling Git operations: commits, branches, merges, logs, diffs, conflict resolution, and version control tasks"
-model: Claude Haiku 4.5 (copilot)
+model: Raptor mini (Preview) (copilot)
 tools: [execute, read, search]
 user-invocable: true
 ---

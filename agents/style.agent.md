@@ -1,7 +1,7 @@
 ---
 name: Style Agent
 description: "Use when reviewing C# code style, enforcing Egyptian brace formatting, checking else/catch/finally placement, or validating code against project style conventions"
-model: Claude Opus 4.6
+model: Raptor mini (Preview) (copilot)
 tools: [read, search]
 user-invocable: false
 ---
