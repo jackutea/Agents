@@ -18,9 +18,9 @@ user-invocable: false
 ## 规范说明
 
 该 agent 的详细架构设计与实现规范已拆分为以下 skill：
-- `skills/architecture-design.skill.md`：架构设计流程、输出规范与架构总览
-- `skills/architecture-entity.skill.md`：Entity/Component/Repository/Pool/Controller/SO/TM 实现模板与编写规范
-- `skills/architecture-context.skill.md`：GameContext 注册规则、上下文边界与命名约定
+- `skills/coding/architecture/architecture-design.skill.md`：架构设计流程、输出规范与架构总览
+- `skills/coding/architecture/architecture-entity.skill.md`：Entity/Component/Repository/Pool/Controller/SO/TM 实现模板与编写规范
+- `skills/coding/architecture/architecture-context.skill.md`：GameContext 注册规则、上下文边界与命名约定
 
 请务必参考上述 skill，避免重复维护。
 

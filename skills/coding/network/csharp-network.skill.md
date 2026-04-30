@@ -109,4 +109,4 @@ public class NetworkServer {
 - 只用中文
 
 ## 说明
-- 本 skill 针对 C# 网络实现细节。通用协议和消息流程请参考 `skills/network.skill.md`。
+- 本 skill 针对 C# 网络实现细节。通用协议和消息流程请参考 `skills/coding/network/network.skill.md`。

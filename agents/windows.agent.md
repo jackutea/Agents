@@ -29,7 +29,7 @@ user-invocable: true
 
 ## 规范说明
 该 agent 的具体实现规范已拆分为：
-- `skills/windows-os-local.skill.md`
+- `skills/windows/windows-os-local.skill.md`
 
 请参阅上述 skill 获取本地 Windows 系统操作的实现细节与约束。
 

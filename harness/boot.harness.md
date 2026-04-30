@@ -1,0 +1,12 @@
+# Boot Harness
+- 将agents, skills, tool导入至新项目，导入过程中询问用户工程环境：
+    - 使用的引擎、框架、工具链（如 Unity, .NET, VS Code 等）
+    - 主要编程语言（如 C#, Python, JavaScript 等）
+    - 其他相关技术栈（如 MySQL, Redis, Nginx 等）
+- 根据用户环境自动调整导入的文件内容，例如：
+    - 导入至Java项目时，自动将 C# 代码转换为 Java 代码
+    - 导入至Debian系统时，自动调整 Linux 相关命令和配置
+- 导入完成后，输出导入结果总结，包括：
+    - 成功导入的文件列表
+    - 任何因环境不兼容而调整或跳过的文件
+    - 下一步建议（如阅读特定 skill 文档、配置环境等）

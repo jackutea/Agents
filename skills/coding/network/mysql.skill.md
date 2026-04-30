@@ -28,5 +28,5 @@
 
 ## 说明
 
-- 具体的 C# 代码实现与模板请参阅 `skills/csharp-mysql.skill.md`。
+- 具体的 C# 代码实现与模板请参阅 `skills/coding/mysql/csharp-mysql.skill.md`。
 - 本 skill 关注 MySQL 访问方案与数据库层设计。

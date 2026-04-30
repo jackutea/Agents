@@ -16,8 +16,8 @@ tools: [read, edit, search]
 ## 规范说明
 
 该 agent 的实现规范已拆分为以下 skill：
-- `skills/mysql.skill.md`：MySQL 数据访问方案、数据库层设计与 Repository 模式。
-- `skills/csharp-mysql.skill.md`：C# 代码实现模板、数据库连接、Table/Repository/事务与查询模式。
+- `skills/coding/network/mysql.skill.md`：MySQL 数据访问方案、数据库层设计与 Repository 模式。
+- `skills/coding/network/csharp-mysql.skill.md`：C# 代码实现模板、数据库连接、Table/Repository/事务与查询模式。
 
 请参阅上述 skill 执行具体设计和代码实现。
 

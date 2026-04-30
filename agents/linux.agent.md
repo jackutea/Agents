@@ -19,10 +19,10 @@ user-invocable: false
 ## 规范说明
 
 该 agent 的具体实现规范已抽离为以下 skill：
-- `skills/linux-os.skill.md`
-- `skills/linux-mysql.skill.md`
-- `skills/linux-redis.skill.md`
-- `skills/linux-nginx.skill.md`
+- `skills/coding/linux/linux-os.skill.md`
+- `skills/coding/linux/linux-mysql.skill.md`
+- `skills/coding/linux/linux-redis.skill.md`
+- `skills/coding/linux/linux-nginx.skill.md`
 
 默认情况下，Linux 操作系统假设为 Ubuntu；如果用户说明为其它发行版，则按实际系统适配。
 
