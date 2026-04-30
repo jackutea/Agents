@@ -3,7 +3,7 @@ name: Main Agent
 description: "Use when handling architecture distillation, convention compliance, milestone planning, Unity module documentation, WeChat mini-game task routing (native and Unity export), AI docs maintenance, task management, or general development workflow"
 model: Claude Opus 4.6
 tools: [read, search, edit, execute, todo, agent, web/fetch, web/githubRepo]
-agents: [Architecture Agent, Entity Agent, Git Agent, Linux MySQL Agent, Linux Nginx Agent, Linux Redis Agent, Milestone Agent, MySQL Agent, Network Agent, Redis Agent, Render Agent, Style Agent, Unity UGUI, WeChat Mini Game Agent]
+agents: [Architecture Agent, Entity Agent, Git Agent, Linux MySQL Agent, Linux Nginx Agent, Linux Redis Agent, Milestone Agent, MySQL Agent, Network Agent, Redis Agent, Render Agent, Style Agent, Unity UGUI, WeChat Mini Game Agent, Game Design Agent]
 user-invocable: true
 ---
 
