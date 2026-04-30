@@ -33,7 +33,7 @@ user-invocable: true
 | **实体/数据模型**| `Architecture Agent` | Entity, Component, Repository, Pool 实现 |
 | **代码风格审查** | `Style Agent` | C# Egyptian Braces, Else/Catch 换行检查, 控制流可读性审查 |
 | **UI 开发** | `Unity Agent` | Panel Prefab, 脚本挂载, Addressables |
-| **Shader/渲染** | `Render Agent` | HLSL, URP RenderFeature, RenderPass |
+| **Shader/渲染** | `Unity Agent` | GLSL、HLSL 转换、URP RenderFeature、RenderPass |
 | **网络通讯** | `Network Agent` | 客户端/服务端通讯, Telepathy, 序列化 |
 | **微信小游戏开发（原生）** | `WeChat Mini Game Agent` | 原生小游戏工程配置、wx API 接入、分包策略与性能优化 |
 | **微信小游戏开发（Unity 导出）** | `WeChat Mini Game Agent` | Unity WebGL 导出、小游戏转换插件适配、桥接脚本与真机性能调优 |

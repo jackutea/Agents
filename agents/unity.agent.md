@@ -14,12 +14,16 @@ user-invocable: true
 - 设计和生成 UI prefab
 - 创建和配置动画剪辑
 - 设计 Animator Controller 和状态机
+- 搜索并参考 Shadertoy GLSL 实现
+- 编写 GLSL 渲染算法，转换为 Unity HLSL 片段
+- 实现 URP ScriptableRendererFeature / ScriptableRenderPass
 
 ## 执行说明
 - 对于项目初始化相关任务，使用 `skills/coding/unity/unity-create-project.skill.md`
 - 对于 UI prefab 相关任务，使用 `skills/coding/unity/unity-prefab.skill.md`
 - 对于动画剪辑相关任务，使用 `skills/coding/unity/unity-animation.skill.md`
 - 对于 Animator Controller 相关任务，使用 `skills/coding/unity/unity-animator.skill.md`
+- 对于 Shader/渲染相关任务，使用 `skills/coding/unity/unity-render.skill.md`
 
 ## 约束
 - 所有文件编码：UTF-8 无 BOM
