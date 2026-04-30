@@ -23,7 +23,7 @@
 | **版本控制** | `Git Agent` | Commit, Branch, Merge, Conflicts 处理 |
 | **层级/接口设计**| `Architecture Agent` | 目录结构、Context 规则、系统/仓储定义 |
 | **里程碑落地** | `Milestone Agent` | TODO 拆解、分步编码实现、进度推进 |
-| **实体/数据模型**| `Entity Agent` | Entity, Component, Repository, Pool 实现 |
+| **实体/数据模型**| `Architecture Agent` | Entity, Component, Repository, Pool 实现 |
 | **代码风格审查** | `Style Agent` | C# Egyptian Braces, Else/Catch 换行检查, 控制流可读性审查 |
 | **UI 开发** | `Unity UGUI` | Panel Prefab, 脚本挂载, Addressables |
 | **Shader/渲染** | `Render Agent` | HLSL, URP RenderFeature, RenderPass |
