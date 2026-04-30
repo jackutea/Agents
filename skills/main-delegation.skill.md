@@ -32,9 +32,9 @@
 | **微信小游戏开发（Unity 导出）** | `WeChat Mini Game Agent` | Unity WebGL 导出、小游戏转换插件适配、桥接脚本与真机性能调优 |
 | **数据库开发** | `MySQL Agent` | FreeSql ORM, Table 映射, CRUD 逻辑 |
 | **缓存/分布式锁** | `Redis Agent` | StackExchange.Redis, Cache, Pub/Sub |
-| **MySQL 运维** | `Linux MySQL Agent`| Linux 环境安装、安全初始化、Root 密码管理 |
-| **Redis 运维** | `Linux Redis Agent`| Linux 环境安装、requirepass 配置与重启 |
-| **Nginx 运维** | `Linux Nginx Agent`| Linux 环境安装、端口映射、HTTP/HTTPS 站点配置 |
+| **MySQL 运维** | `Linux Agent`| Linux 环境安装、安全初始化、Root 密码管理 |
+| **Redis 运维** | `Linux Agent`| Linux 环境安装、requirepass 配置与重启 |
+| **Nginx 运维** | `Linux Agent`| Linux 环境安装、端口映射、HTTP/HTTPS 站点配置 |
 
 ## 并行委派规则 (Parallel Delegation)
 
