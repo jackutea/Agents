@@ -1,6 +1,6 @@
 # Main Delegation Skill
 
-用于主控代理的调度与里程碑执行规范。此 skill 提取了主控代理中的任务分发、并行委派、执行流程和 Milestone 模板。
+用于主控代理调用专业子代理并汇总执行结果的规范。此 skill 提取了主控代理中的任务分发、并行委派、结果汇总流程和 Milestone 模板。
 
 ## 主控流程
 
@@ -10,9 +10,10 @@
 4. **建立里程碑 (Milestone)**：创建或更新 Milestone 文档，定义阶段目标与边界。
 5. **拆解任务 (TODO)**：将 Milestone 进一步拆成可执行 TODO，标注优先级与依赖关系。
 6. **委派执行 (Delegation)**：按子代理分发地图将 TODO 分发给对应 Agent，并约束输入/输出；对可并行任务可同时委派多个对应 Agent。
-7. **进度同步**：回写里程碑进度与当前阻塞项，保持状态可追踪。
+7. **结果汇总**：收集子代理执行结果、输出和发现，形成用户可读汇总。
+8. **确认补充执行**：向用户询问是否需要补充执行或进一步指示。
 
-> 固定顺序：**需求 → Milestone → TODO → 委派 Agent**。
+> 固定顺序：**需求 → Milestone → TODO → 委派 Agent → 结果汇总 → 询问补充**。
 
 ## 子代理分发地图 (Delegation Map)
 
@@ -54,6 +55,7 @@
 - 明确[不在]本次范围的内容
 
 ## 2. 任务拆解 (TODO)
+* Milestone 1-1 {Milestone Name} (M1)
 - [ ] 任务A (委派: `@Architecture Agent`)
 - [ ] 任务B (委派: `@Milestone Agent`)
 
