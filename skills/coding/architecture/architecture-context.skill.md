@@ -1,3 +1,8 @@
+---
+name: architecture-context
+description: "用于架构上下文与 GameContext 注册规范，适用于定义状态、事件、模块、管理器、仓储、对象池和全局实体的注册边界与命名规则。"
+---
+
 # Architecture Context Skill
 
 此 skill 定义了 GameContext 与架构上下文注册规范，用于保证架构层的对象注册、依赖方向和命名一致性。

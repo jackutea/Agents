@@ -1,3 +1,8 @@
+---
+name: linux-nginx
+description: "用于 Linux 环境下的 Nginx 安装与配置，适用于 HTTP/HTTPS 站点、TCP 转发、证书参数确认、服务重载与结果验证。"
+---
+
 # Linux Nginx Skill
 
 此 skill 提取了 Linux Nginx 代理的实现流程、配置约束和非交互式参考。

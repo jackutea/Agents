@@ -1,4 +1,9 @@
-﻿# CSharp MySQL Skill
+﻿---
+name: csharp-mysql
+description: "用于 C# 与 MySQL 的联合代码实现，适用于数据库连接、DatabaseManager、实体类、Repository、事务处理与查询模式模板。"
+---
+
+# CSharp MySQL Skill
 
 此 skill 提取 C# 代码层面与 MySQL 数据访问相关的实现模板，避免语言混淆，专注于 C# 与 MySQL 的联合代码实现。
 

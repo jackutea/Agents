@@ -1,3 +1,8 @@
+---
+name: style-review
+description: "用于 C# 代码风格审查，适用于检查缩进、大括号风格、控制流可读性、诊断规则忽略项以及统一的风格输出格式。"
+---
+
 # Style Review Skill
 
 此 skill 提取了 Style Agent 的详细代码风格规范、审查流程与输出要求，用于统一 C# 代码风格审查标准。

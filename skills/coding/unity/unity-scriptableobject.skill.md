@@ -1,3 +1,8 @@
+---
+name: unity-scriptableobject
+description: "用于创建和补全 Unity ScriptableObject 资源文件，适用于生成自定义 .asset 与 .asset.meta、校验资源路径与类型信息、返回可继续使用的资源结果。"
+---
+
 # Unity ScriptableObject Skill
 
 此 skill 专注于 Unity ScriptableObject 资源文件的创建，尤其适用于自定义 `.asset` 与 `.asset.meta` 文件的生成与补全。

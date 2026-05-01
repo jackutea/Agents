@@ -1,3 +1,8 @@
+---
+name: network
+description: "用于网络通信设计与协议实现，适用于规划消息协议、消息注册、NetworkServer 与 NetworkModule 职责边界，以及主线程安全的网络处理流程。"
+---
+
 # Network Skill
 
 此 skill 提取网络通信设计与协议实现的通用规范，适用于任意编程语言。具体语言实现可按项目技术栈选择，C# 代码方面可参考 `skills/coding/network/csharp-network.skill.md`。

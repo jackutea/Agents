@@ -1,3 +1,8 @@
+---
+name: linux-mysql
+description: "用于 Linux 环境下的 MySQL 安装与初始化，适用于识别发行版、非交互安装、Root 密码配置、服务启动以及结果验证。"
+---
+
 # Linux MySQL Skill
 
 此 skill 提取了 Linux MySQL 代理的实现流程、配置约束和非交互式初始化参考。

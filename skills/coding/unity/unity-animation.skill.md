@@ -1,3 +1,8 @@
+---
+name: unity-animation
+description: "用于 Unity 动画剪辑与动画资源创建，适用于设计关键帧、配置循环与事件、生成 Animation Clip 资源及命名路径。"
+---
+
 # Unity Animation Skill
 
 此 skill 提取 Unity 动画剪辑与动画资源创建的实现规范，适用于角色动画、UI 动画、过渡效果等场景。

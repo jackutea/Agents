@@ -1,3 +1,8 @@
+---
+name: csharp-network
+description: "用于 C# 网络实现细节，适用于设计 IMessage、消息类、对象池、NetworkServer/NetworkModule 封装，以及 Telepathy 兼容的主线程消息处理。"
+---
+
 # CSharp Network Skill
 
 此 skill 提取 C# 网络实现的语言级细节与实现模板，专注于 `IMessage` 设计、消息类、NetworkServer、NetworkModule 和 Telepathy 兼容。

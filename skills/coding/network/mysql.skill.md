@@ -1,3 +1,8 @@
+---
+name: mysql
+description: "用于 MySQL 数据访问方案设计，适用于规划表结构、实体映射、Repository 模式、连接配置、事务处理与复杂查询策略。"
+---
+
 # MySQL Skill
 
 此 skill 提取 MySQL 数据访问实现的通用流程与设计规范，适用于 ORM 或数据库访问层的模型、连接配置与 Repository 模式。

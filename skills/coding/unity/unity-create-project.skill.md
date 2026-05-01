@@ -1,3 +1,8 @@
+---
+name: unity-create-project
+description: "用于 Unity 项目创建与初始化，适用于创建目录结构、按 Unity 版本生成 .gitignore、根据 gist 创建 .editorconfig、配置 Package 与项目设置。"
+---
+
 # Unity Create Project Skill
 
 此 skill 专注于 Unity 项目创建和初始化流程，涵盖项目目录、Package 管理、Settings 配置以及基础工程约定。

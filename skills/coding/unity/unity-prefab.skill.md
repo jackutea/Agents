@@ -1,3 +1,8 @@
+---
+name: unity-prefab
+description: "用于 Unity UI prefab 构建，适用于设计节点层级、生成 .prefab 与 .prefab.meta、挂载脚本组件，以及配置 Addressables 标记。"
+---
+
 # Unity Prefab Skill
 
 此 skill 专注于 Unity UI prefab 的构建与绑定，尤其适用于 Panel、窗口、界面组件等 prefab 生成与脚本挂载。

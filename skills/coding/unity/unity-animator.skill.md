@@ -1,3 +1,8 @@
+---
+name: unity-animator
+description: "用于 Unity Animator Controller 与状态机设计，适用于创建动画状态、参数、转换条件、Blend Tree 与子状态机结构。"
+---
+
 # Unity Animator Skill
 
 此 skill 专注于 Unity Animator Controller 和状态机设计，适用于角色、UI 或系统页面的动画状态转换。

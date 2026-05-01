@@ -1,3 +1,8 @@
+---
+name: unity-render
+description: "用于 Unity 渲染与 Shader 开发，适用于查找 GLSL/Shadertoy 参考、将 GLSL 转为 Unity HLSL，以及实现 URP RenderFeature 和 RenderPass 集成。"
+---
+
 # Unity Render Skill
 
 此 skill 定义了 Unity 渲染特效的实现规范，专注于 GLSL 算法来源、Shadertoy 参考、GLSL 到 HLSL 的转换，以及 URP RenderFeature/RenderPass 的集成。此 skill 适用于 Unity 渲染开发，以下内容以 C# / Unity 为参考实现。

@@ -1,3 +1,8 @@
+---
+name: linux-os
+description: "用于 Linux 操作系统层面的适配与执行规范，适用于识别发行版、抽象包管理器、远程执行、安全检查以及服务管理。"
+---
+
 # Linux OS Skill
 
 此 skill 提供 Linux 操作系统层面的通用适配与执行规范，作为 Linux 服务执行的底层支持。

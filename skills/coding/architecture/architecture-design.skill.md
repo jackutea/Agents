@@ -1,3 +1,8 @@
+---
+name: architecture-design
+description: "用于架构设计与评审，适用于根据需求输出分层设计方案、目录结构、类名字段、依赖关系以及实现约束。"
+---
+
 # Architecture Design Skill
 
 该 skill 提取了架构代理的详细流程、输出规范和架构实现速查内容，用于指导架构设计与评审。

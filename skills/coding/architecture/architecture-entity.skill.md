@@ -1,3 +1,8 @@
+---
+name: architecture-entity
+description: "用于架构层的 Entity/Component/Repository/Pool/Controller/SO/TM 设计与实现，适用于输出详细模板、命名规则与生命周期约束。"
+---
+
 # Architecture Entity Skill
 
 此 skill 提取了 Architecture 领域内 Entity/Component/Repository/Pool/Controller/SO/TM 的详细实现规范与模板。
