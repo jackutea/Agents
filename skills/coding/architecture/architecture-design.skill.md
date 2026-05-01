@@ -7,6 +7,59 @@ description: "用于架构设计与评审，适用于根据需求输出分层设
 
 该 skill 提取了架构代理的详细流程、输出规范和架构实现速查内容，用于指导架构设计与评审。
 
+## 接收的 Input
+
+- 当前需求对应的业务目标、功能边界和目标平台
+- 需要设计的架构层级，例如 `Entity`、`Repository`、`Controller`、`System`、`Module`、`Manager`
+- 已知目录结构、命名规则、依赖限制和运行时约束
+- 是否涉及 UI、热更、网络、存档、资源分阶段加载等专项约束
+
+若输入中缺少目标层级、依赖边界或目标平台，必须先指出阻塞项。
+
+## 处理的事项
+
+1. 分析需求对应的架构层级与对象边界。
+2. 判断入口形态、目录结构和分层依赖是否需要调整。
+3. 输出类名、字段、namespace、路径和依赖关系设计。
+4. 校验设计是否符合顺序分层、上下文边界、UI 约束和平台裁剪规则。
+5. 汇总成可直接交给实现阶段使用的架构设计结果。
+
+## 输出的 Output
+
+architecture-design.skill 的 Output 应包含：
+
+- 分层后的设计方案
+- 目标文件路径、类名、namespace 和字段结构
+- 关键依赖方向与调用关系
+- 需要特别遵守的实现约束和风险点
+
+## 任务编排
+
+architecture-design.skill 的任务编排是先识别需求所属层级，再完成分层设计与约束校验，最后输出结构化设计方案。
+
+伪代码如下：
+
+```text
+architectureDesign(input) {
+    if (isMissingArchitectureRequirement(input)) {
+        return buildBlockedResult(input)
+    }
+
+    var designScope = analyzeArchitectureScope(input)
+    var designDraft = buildLayeredDesign(designScope)
+    validateDependencyRules(designDraft)
+    validatePlatformAndUiConstraints(designDraft)
+
+    return summarizeArchitectureDesign(designDraft)
+}
+```
+
+约束说明：
+
+- 输出必须落到具体层级、路径和类结构，不能只停留在抽象原则。
+- 若发现下层感知上层或 UI 运行时动态创建节点，必须直接标记为违规。
+- 设计阶段只输出方案，不替代具体代码实现。
+
 ## 设计流程
 
 1. 读取本 skill 的 Gist 规范，建立上下文。
