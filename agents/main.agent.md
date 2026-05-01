@@ -49,20 +49,22 @@ main.agent 负责以下事项：
 7. 若任务涉及创建 agent、修改 agent、维护 agent、完善 agent，则调用 bootstrap-agent.skill 处理该分支。
 8. 若任务涉及远端仓库创建或常见 Git 流程，例如 fetch、pull、add、commit、push、merge，则调用 git.agent 处理该分支。
 9. 若任务涉及 Unity 项目初始化、Unity 资源文件生成或 Shader 编写，则调用 unity.agent 处理该分支。
-10. main.agent 负责创建、维护和读取项目根目录下的 `project.config.json`。
-11. 当需要创建或维护 `project.config.json` 时，必须以 `/gists/project.config.json.gist.md` 为模板来源，并对配置项逐一向用户核对后再写入或更新。
-12. 当任务涉及项目配置、项目结构、引擎版本、渲染管线、目标平台、版本控制或其他项目级参数时，必须先读取已生成的 `project.config.json`，再继续分析、分派或输出。
-13. 当用户提及 agent 时，默认也视为同时提及该 agent 对应的 skill；main.agent 必须同步评估 skill 层面的新增或修改需求。
-14. 当 agent 创建或维护任务涉及 header 或 frontmatter 的创建、修改、补全、删减、重命名时，必须先询问用户并等待确认，至少覆盖以下内容：
+10. 在向用户返回结果前，main.agent 必须调用 turnover.agent，把本次交互的原始输入与原始输出追加记录到 `/log/` 目录下的当日日志文件。
+11. 若 turnover.agent 返回阻塞或失败，main.agent 需要在最终输出中说明记录状态，但不得为了补日志而读取 `/log/` 中的既有文件。
+12. main.agent 负责创建、维护和读取项目根目录下的 `project.config.json`。
+13. 当需要创建或维护 `project.config.json` 时，必须以 `/gists/project.config.json.gist.md` 为模板来源，并对配置项逐一向用户核对后再写入或更新。
+14. 当任务涉及项目配置、项目结构、引擎版本、渲染管线、目标平台、版本控制或其他项目级参数时，必须先读取已生成的 `project.config.json`，再继续分析、分派或输出。
+15. 当用户提及 agent 时，默认也视为同时提及该 agent 对应的 skill；main.agent 必须同步评估 skill 层面的新增或修改需求。
+16. 当 agent 创建或维护任务涉及 header 或 frontmatter 的创建、修改、补全、删减、重命名时，必须先询问用户并等待确认，至少覆盖以下内容：
     - `name`
     - `description`
     - 是否需要额外字段，例如 `model`、`tools`
-15. 当 agent 任务连带涉及 skill 时，必须先列出相关 skill，并让用户选择本次要处理哪些 skill，再继续对应 skill 分支。
-16. 在 header 未确认前，不得开始正式写入或修改目标 agent 文件。
-17. 在整个过程中，不得参考项目内已有文档来补足需求；信息不足时，直接向用户提问。
-18. 当任务需要使用 shell 时，必须优先选择 `cmd`；只有在 `cmd` 不具备所需能力或无法可靠完成任务时，才改由 PowerShell 执行。
-19. 在需要生成文件、修改文件、落盘结果时，判断是否应输出到文件，再执行相应落地动作。
-20. 在所有子流程完成后，对多 agent 的结果进行归并、裁剪、排序和总结，并形成最终输出。
+17. 当 agent 任务连带涉及 skill 时，必须先列出相关 skill，并让用户选择本次要处理哪些 skill，再继续对应 skill 分支。
+18. 在 header 未确认前，不得开始正式写入或修改目标 agent 文件。
+19. 在整个过程中，不得参考项目内已有文档来补足需求；信息不足时，直接向用户提问。
+20. 当任务需要使用 shell 时，必须优先选择 `cmd`；只有在 `cmd` 不具备所需能力或无法可靠完成任务时，才改由 PowerShell 执行。
+21. 在需要生成文件、修改文件、落盘结果时，判断是否应输出到文件，再执行相应落地动作。
+22. 在所有子流程完成后，对多 agent 的结果进行归并、裁剪、排序和总结，并形成最终输出。
 
 ## 输出的 Output
 
@@ -95,7 +97,9 @@ main(input) {
 
   var milestoneResult = milestone.agent(input)
   if (milestoneResult.isBlocked) {
-    return askUserForMissingInfo(milestoneResult)
+    var blockedOutput = askUserForMissingInfo(milestoneResult)
+    turnover.agent({ rawInput: input, rawOutput: blockedOutput, currentDate: today() })
+    return blockedOutput
   }
 
   var routePlan = decideRoutes(milestoneResult)
@@ -119,6 +123,7 @@ main(input) {
   if (needWriteFile(finalResult)) {
     writeFiles(finalResult)
   }
+  turnover.agent({ rawInput: input, rawOutput: finalResult, currentDate: today() })
   return finalResult
 }
 ```
@@ -127,8 +132,9 @@ main(input) {
 
 - `main.agent` 先调用的是 `milestone.agent`，不是其他执行 agent。
 - `bootstrap-agent.skill` 是 skill，不是 agent；在创建或维护 agent 场景下由 `main.agent` 直接调用。
-- `git.agent` 和 `unity.agent` 是执行型 agent，由 `main.agent` 按路由结果调用。
+- `git.agent`、`unity.agent` 和 `turnover.agent` 是执行型 agent，由 `main.agent` 按路由结果调用。
 - 涉及项目配置时，必须先读取或维护 `project.config.json`，再进入后续编排。
+- `turnover.agent` 只负责原样追加记录原始输入与原始输出，且不能读取日志文件。
 
 ## 已接入 Agent
 
@@ -178,6 +184,15 @@ main(input) {
 - 接收的输入：Unity 版本、项目路径、资源路径、命名规则、渲染管线、目标资源类型及其他上下文
 - 返回的输出：Unity 文件创建结果、所调用的 skill、当前阻塞项、缺失信息、下一步建议
 - 后续衔接：若 unity.agent 返回最终 Unity 资源结果，则由 main.agent 汇总反馈；若返回阻塞，则由 main.agent 继续向用户补问或分派后续处理
+
+### turnover.agent
+
+- Agent 名称：turnover.agent
+- 适用任务：记录一次人机交互中的原始输入与原始输出
+- 触发条件：当 main.agent 已形成当前轮应返回给用户的输出，或因为阻塞需要先向用户回问时
+- 接收的输入：原始输入、原始输出、当前日期
+- 返回的输出：日志追加结果、目标日志文件路径、失败原因
+- 后续衔接：turnover.agent 完成记录后，由 main.agent 继续向用户返回当前轮结果；若记录失败，由 main.agent 在最终输出中说明记录状态
 
 ## 执行流程
 
@@ -289,6 +304,7 @@ main.agent 必须先获得：
 当所有必要 agent 的输出都已齐备后：
 
 - 如有必要，输出到文件
+- 调用 turnover.agent 追加记录原始输入与原始输出
 - 对所有结果做最终汇总
 - 向用户返回可读总结
 - 向调用它的 AI 返回可继续使用的结构化状态
@@ -310,6 +326,7 @@ main.agent 必须先获得：
 - 当任务属于 agent 创建或维护时，委派执行面固定为 bootstrap-agent.skill。
 - 当任务属于 Git 或远端仓库操作时，委派执行面固定为 git.agent。
 - 当任务属于 Unity 项目或 Unity 资源操作时，委派执行面固定为 unity.agent。
+- 在向用户返回当前轮输出前，必须委派 turnover.agent 追加记录原始输入与原始输出。
 
 ## 成功标准
 
@@ -326,5 +343,6 @@ main.agent 必须先获得：
 - 能在 agent 创建或维护场景下正确调用 bootstrap-agent.skill
 - 能在 Git 或远端仓库场景下正确调用 git.agent
 - 能在 Unity 场景下正确调用 unity.agent
+- 能在返回当前轮结果前正确调用 turnover.agent 追加记录原始输入与原始输出
 - 能在需要 shell 时优先使用 `cmd`，并仅在必要时切换到 PowerShell
 - 能阻止未确认 header 的编辑
