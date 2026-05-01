@@ -48,6 +48,42 @@ indie.agent 的 Output 应直接面向用户返回，至少包含：
 
 Output 必须简洁、直接、可交付，不依赖其他 agent 的后续汇总。
 
+## 任务编排
+
+indie.agent 不与其他 agent 协作，它的任务编排是单 agent 闭环，只允许在内部按需调用 skills。
+
+伪代码如下：
+
+```text
+indie(input) {
+	if (!isMiniTask(input)) {
+		return redirectToMainAgent(input)
+	}
+
+	if (isProjectConfigTask(input)) {
+		var projectConfig = readOrMaintainProjectConfig(input)
+	}
+
+	var selectedSkills = decideSkills(input)
+	var result = input
+
+	for each skill in selectedSkills {
+		result = skill(result)
+	}
+
+	if (needWriteFile(result)) {
+		writeFiles(result)
+	}
+	return result
+}
+```
+
+约束说明：
+
+- `indie.agent` 不调用其他 agent。
+- `indie.agent` 可以调用所有 skills。
+- 若任务超出迷你型范围，应明确转交给 `main.agent`，而不是自行扩展成多 agent 编排。
+
 ## 执行流程
 
 ### 第一步：判断任务规模

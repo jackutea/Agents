@@ -50,6 +50,53 @@ unity.agent 的 Output 必须返回给调用者，且应尽量结构化，至少
 - 当前结果：成功、失败、阻塞、等待用户确认
 - 若失败或阻塞，返回缺失信息与下一步建议
 
+## 任务编排
+
+unity.agent 的任务编排是单 agent 内部按任务类型调用多个 Unity skills；当任务涉及架构设计时，必须补齐所有相关的 architecture skills，而不是只调用一部分。
+
+伪代码如下：
+
+```text
+unity(input) {
+	var taskTypes = detectUnityTaskTypes(input)
+	if (isMissingCriticalInfo(taskTypes, input)) {
+		return buildBlockedResult(input)
+	}
+
+	var results = []
+
+	if (includesProjectInit(taskTypes) || includesGitIgnore(taskTypes) || includesEditorConfig(taskTypes)) {
+		results.push(unity-create-project.skill(input))
+	}
+	if (includesScriptableObject(taskTypes)) {
+		results.push(unity-scriptableobject.skill(input))
+	}
+	if (includesPrefab(taskTypes)) {
+		results.push(unity-prefab.skill(input))
+	}
+	if (includesShader(taskTypes)) {
+		results.push(unity-render.skill(input))
+	}
+	if (includesCSharp(taskTypes)) {
+		results.push(unity-csharp.skill(input))
+	}
+	if (includesArchitecture(taskTypes)) {
+		results.push(architecture-context.skill(input))
+		results.push(architecture-design.skill(input))
+		results.push(architecture-entity.skill(input))
+		results.push(style-review.skill(input))
+	}
+
+	return summarizeUnityResults(results)
+}
+```
+
+约束说明：
+
+- `unity.agent` 不调用其他 agent。
+- `unity.agent` 通过 skills 完成内部编排。
+- 涉及架构层任务时，必须把相关 architecture skills 全部纳入编排。
+
 ## 执行流程
 
 ### 第一步：确认 Unity 任务类型
