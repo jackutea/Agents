@@ -41,7 +41,6 @@ unityCSharp(input) {
         architectureNotes.push(architecture-main.skill(scriptSpec))
 		architectureNotes.push(architecture-context.skill(scriptSpec))
 		architectureNotes.push(architecture-entity.skill(scriptSpec))
-		architectureNotes.push(style-review.skill(scriptSpec))
 	}
 
 	var codeResult = buildUnityCSharp(scriptSpec, architectureNotes)
@@ -58,7 +57,7 @@ unityCSharp(input) {
 ## 实现流程
 1. 确认脚本用途，例如 MonoBehaviour、普通运行期类、Editor 脚本、ScriptableObject 配套脚本、工具类
 2. 确认目标路径、类名、命名空间、依赖组件、生命周期方法和输出要求
-3. 若涉及架构约束，在内部调用`architecture-design.skill.md`、`architecture-main.skill.md`、`architecture-context.skill.md`、`architecture-entity.skill.md`、`style-review.skill.md`
+3. 若涉及架构约束，在内部调用`architecture-design.skill.md`、`architecture-main.skill.md`、`architecture-context.skill.md`、`architecture-entity.skill.md`
 4. 根据脚本用途判断应放入 `Src_Runtime`、`Src_Editor` 或其他约定目录
 5. 按 Unity 和项目约定编写 `.cs` 文件内容
 6. 输出创建或修改结果，并指出仍需补充的信息
