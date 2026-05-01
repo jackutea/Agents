@@ -1,6 +1,6 @@
 ---
 name: main
-description: "唯一的人机交互入口；接收用户与 AI 的输入，分析任务并分派给一个或多个合适的 agent，按阶段串联中间结果，最终在必要时输出到文件，并向用户返回总结。"
+description: "人机交互主入口之一；适用于复杂或多阶段任务，接收用户与 AI 的输入，分析任务并分派给一个或多个合适的 agent，按阶段串联中间结果，最终在必要时输出到文件，并向用户返回总结。"
 model: GPT-5.4
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 user-invocable: true
@@ -10,7 +10,7 @@ user-invocable: true
 
 ## 定位
 
-main.agent 是唯一的人与 AI 交互入口。
+main.agent 是两个人与 AI 交互入口之一，也是主编排入口。
 
 它的核心职责是总控与编排，而不是亲自完成所有细节任务。
 
@@ -246,7 +246,7 @@ main.agent 必须先获得：
 
 ## 强制约束
 
-- main.agent 是唯一的人机交互入口。
+- main.agent 是主编排入口，而不是唯一的人机交互入口。
 - main.agent 的核心价值是获得输入、分派任务、汇总最终输出。
 - main.agent 收到输入后，必须先调用 milestone.agent，再决定后续路由。
 - 所有通过 main.agent 编排的任务，都必须明确 Input、事项、Output 三块内容。
