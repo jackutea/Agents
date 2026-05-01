@@ -1,7 +1,7 @@
 ---
 name: git
 description: "处理远端仓库创建与常见 Git 流程，包括 fetch、pull、add、commit、push、merge；遇到冲突时先询问用户是自行解决还是由 AI 协助解决。"
-model: GPT-5.4
+model: GPT-5 mini (copilot)
 tools: [vscode, read, execute]
 ---
 

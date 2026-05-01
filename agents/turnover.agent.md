@@ -1,7 +1,7 @@
 ---
 name: turnover
 description: "在 /log/ 目录下按日追加记录人机交互的原始输入与原始输出，不读取既有日志。"
-model: GPT-5.4
+model: GPT-5 mini (copilot)
 tools: [edit]
 user-invocable: false
 ---
