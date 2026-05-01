@@ -7,6 +7,60 @@ description: "用于架构层的 Entity/Component/Repository/Pool/Controller/SO/
 
 此 skill 提取了 Architecture 领域内 Entity/Component/Repository/Pool/Controller/SO/TM 的详细实现规范与模板。
 
+## 接收的 Input
+
+- 目标实体或功能模块的需求说明
+- 需要落地的对象类型，例如 `Entity`、`Component`、`Repository`、`Pool`、`Controller`、`SO`、`TM`
+- 命名规则、生命周期要求、唯一 ID 规则和查询需求
+- 是否属于场景实体、纯数据实体、全局唯一实体或面板实体
+
+若缺少目标对象类型、生命周期要求或查询场景，必须先返回缺失项。
+
+## 处理的事项
+
+1. 判断当前需求需要哪些对象组合，例如只需要 `Entity + Component`，还是需要 `Repository + Pool + Controller + SO` 一整套。
+2. 为各对象分配职责边界、命名和生命周期规则。
+3. 输出 `Entity`、`Component`、`Repository`、`Pool`、`Controller`、`SO/TM` 的结构模板。
+4. 校验对象之间是否满足低层纯数据、高层控制和统一查询访问的分层要求。
+5. 汇总为可直接进入实现阶段的实体设计结果。
+
+## 输出的 Output
+
+architecture-entity.skill 的 Output 应包含：
+
+- 需要创建或修改的对象清单
+- 每个对象的职责、命名和推荐结构
+- 生命周期顺序与关键方法建议
+- 若存在违规，明确指出分层、命名或生命周期问题
+
+## 任务编排
+
+architecture-entity.skill 的任务编排是先识别对象组合，再分配结构职责与生命周期，最后输出实体实现方案。
+
+伪代码如下：
+
+```text
+architectureEntity(input) {
+    if (isMissingEntitySpec(input)) {
+        return buildBlockedResult(input)
+    }
+
+    var entityPlan = analyzeEntityScope(input)
+    defineEntityAndComponents(entityPlan)
+    defineRepositoryAndPool(entityPlan)
+    defineControllerAndSo(entityPlan)
+    validateLifecycleAndLayering(entityPlan)
+
+    return summarizeEntityPlan(entityPlan)
+}
+```
+
+约束说明：
+
+- 纯数据对象只承载数据，不承载业务控制逻辑。
+- `Controller` 负责控制流，`Repository` 负责查询访问，不能互相越位。
+- 输出必须体现对象组合关系与生命周期，而不是只给单个模板片段。
+
 ## Entity + Component
 
 ### 模板
