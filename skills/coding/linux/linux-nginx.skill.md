@@ -7,6 +7,64 @@ description: "用于 Linux 环境下的 Nginx 安装与配置，适用于 HTTP/H
 
 此 skill 提取了 Linux Nginx 代理的实现流程、配置约束和非交互式参考。
 
+## 接收的 Input
+
+- 目标 Linux 主机信息和连接方式
+- 目标发行版或待探测的操作系统信息
+- 域名、监听端口、上游映射规则和 TCP 转发需求
+- HTTPS 证书路径、私钥路径和是否启用跳转的要求
+
+若站点参数、证书参数或端口映射规则不完整，则不能生成配置。
+
+## 处理的事项
+
+1. 确认远程连接上下文并侦测目标发行版。
+2. 向用户获取完整站点参数、证书参数和 TCP 转发规则。
+3. 以非交互方式安装 Nginx 并设置开机自启。
+4. 生成 HTTP/HTTPS 站点配置或 stream 转发配置。
+5. 执行 `nginx -t` 校验、重载服务并验证结果。
+
+## 输出的 Output
+
+linux-nginx.skill 的 Output 应包含：
+
+- 识别出的发行版与安装方案
+- 生成的站点或 stream 配置范围
+- 配置校验与服务重载结果
+- HTTP、HTTPS 或 TCP 转发验证结果与失败原因
+
+## 任务编排
+
+linux-nginx.skill 的任务编排是先确认环境和配置参数，再安装 Nginx，随后写配置、校验并验证服务。
+
+伪代码如下：
+
+```text
+linuxNginx(input) {
+    if (isMissingHostContext(input)) {
+        return buildBlockedResult(input)
+    }
+
+    var osPlan = detectNginxHostOs(input)
+    if (isMissingNginxSiteParams(input)) {
+        return askUserForNginxParams(osPlan)
+    }
+
+    var installResult = installNginx(osPlan)
+    var configResult = writeNginxConfig(installResult, input)
+    var testResult = testNginxConfig(configResult)
+    var verifyResult = verifyNginxEndpoints(testResult, input)
+
+    return summarizeLinuxNginxResult(osPlan, installResult, configResult, testResult, verifyResult)
+}
+```
+
+约束说明：
+
+- 证书路径、私钥路径和端口映射缺失时，禁止写配置。
+- 必须先 `nginx -t`，后重载服务。
+- 输出必须区分安装、配置、校验和验证四个阶段。
+
 ## 核心职责
 
 - 识别 Linux 发行版（Ubuntu/Debian、CentOS/RHEL）
