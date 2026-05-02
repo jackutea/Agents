@@ -37,10 +37,11 @@ program.module.agent 负责以下事项：
 5. 当任务明确属于 AudioModule 时，调用 `program-audiomodule.skill.md`。
 6. 当任务明确属于 InputModule 时，调用 `program-inputmodule.skill.md`。
 7. 当任务明确属于 NetworkClientModule 时，调用 `networkclientmodule.skill.md`。
-8. 当任务涉及其他 C# module 编写或修改时，输出或修改对应 `.cs` 文件。
-9. 当任务属于 Unity 语境中的 C# 脚本或模块实现，且尚无对应 module skill 时，调用 `unity-csharp.skill.md` 处理具体脚本结构与架构约束。
-10. 当任务仅是普通 module 结构调整时，直接给出目标模块的文件结果或修改建议。
-11. 若信息不足，先向调用方返回缺失项和下一步建议。
+8. 当任务明确属于 L10NModule 时，调用 `program-l10nmodule.skill.md`。
+9. 当任务涉及其他 C# module 编写或修改时，输出或修改对应 `.cs` 文件。
+10. 当任务属于 Unity 语境中的 C# 脚本或模块实现，且尚无对应 module skill 时，调用 `unity-csharp.skill.md` 处理具体脚本结构与架构约束。
+11. 当任务仅是普通 module 结构调整时，直接给出目标模块的文件结果或修改建议。
+12. 若信息不足，先向调用方返回缺失项和下一步建议。
 
 ## 输出的 Output
 
@@ -86,6 +87,10 @@ programModule(input) {
 		return networkclientmodule.skill(moduleSpec)
 	}
 
+	if (isL10NModule(moduleSpec)) {
+		return program-l10nmodule.skill(moduleSpec)
+	}
+
 	if (isCSharpModule(moduleSpec)) {
 		return unity-csharp.skill(moduleSpec)
 	}
@@ -119,6 +124,7 @@ programModule(input) {
 - 若目标是 AudioModule：调用 `program-audiomodule.skill.md`
 - 若目标是 InputModule：调用 `program-inputmodule.skill.md`
 - 若目标是 NetworkClientModule：调用 `networkclientmodule.skill.md`
+- 若目标是 L10NModule：调用 `program-l10nmodule.skill.md`
 - 若目标是其他 Unity C# 模块或 Unity `.cs` 脚本：调用 `unity-csharp.skill.md`
 - 若目标不是 Unity C# 脚本：直接在 program.module.agent 内整理并输出模块结果
 
@@ -146,6 +152,7 @@ programModule(input) {
 - 能在 AudioModule 场景下正确调用 `program-audiomodule.skill.md`
 - 能在 InputModule 场景下正确调用 `program-inputmodule.skill.md`
 - 能在 NetworkClientModule 场景下正确调用 `networkclientmodule.skill.md`
+- 能在 L10NModule 场景下正确调用 `program-l10nmodule.skill.md`
 - 能把 C# 编程职责从上游 agent 接到 program.module.agent
 - 能在 Unity C# 场景下正确调用 `unity-csharp.skill.md`
 - 能把结果以结构化方式返回给调用者
