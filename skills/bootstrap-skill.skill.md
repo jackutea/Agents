@@ -16,35 +16,16 @@ bootstrap-skill.skill 只负责 skill 文件本身的创建、修改、补全与
 - 约束由本 skill 创建或修改的目标 skill 采用与本 skill 相同的六块结构，不额外保留其他并列章节。
 - 确保目标 skill 保留 header，并且正文不出现“由谁调用该 skill”的描述。
 - 在信息充分后，产出结构清晰、规则可执行、可直接使用的 skill 文件。
-
-本 skill 适用于以下情况：
-
-- 用户要求创建新的 skill。
-- 用户要求修改、重写、收敛或扩展已有 skill。
-- 用户要求完善 skill 的职责、输入、输出、任务编排或约束。
-
-本 skill 不适用于以下情况：
-
-- 只是修改普通代码文件，而不是 skill 文件。
-- 只是解释 skill 概念，没有要求落地到文件。
-- 只是修复运行时代码错误，且问题不在 skill 定义本身。
-
-若用户提供的信息不足以可靠完成 skill 文件，必须先返回缺失项并向用户提问，而不是自行脑补。
+- 仅适用于 skill 文件本身的创建、修改、重写、收束与说明补全；不处理普通业务代码，也不替代运行时代码修复。
 
 ## Input
-
-bootstrap-skill.skill 接收以下 Input：
 
 - 用户关于 skill 创建或维护的目标。
 - 目标 skill 的用途、触发条件、边界与禁区。
 - 目标 skill 需要处理的输入、任务编排、输出要求。
 - 目标 skill 是否已存在，以及本次是新增还是修改。
 
-若这些信息不足以可靠写出 skill 文件，必须先向用户提问补齐。
-
 ## Output
-
-bootstrap-skill.skill 的 Output 至少应包含：
 
 - 本次是新建还是修改 skill。
 - 创建或修改的目标 skill 文件。
@@ -54,13 +35,12 @@ bootstrap-skill.skill 的 Output 至少应包含：
 
 ## 任务编排
 
-bootstrap-skill.skill 的任务编排是围绕单个目标 skill 进行结构补全与规则修正，并确保最终结构收束为固定六块内容。
-
 伪代码如下：
 
 ```text
 bootstrapSkill(input) {
-  // Input: 用户提供的 skill 目标、触发条件、边界、任务编排要求、输出要求，以及当前是新建还是修改。
+  // Input 是用户提供的 skill 目标、触发条件、边界、任务编排要求、输出要求，以及当前是新建还是修改。
+  // 只处理 skill 文件本身；若任务实际是普通代码修改、纯概念解释或运行时代码修复，应直接返回改派建议。
   var taskType = decideCreateOrUpdate(input)
   var skillSpec = collectSkillSpec(input)
 
@@ -82,6 +62,7 @@ bootstrapSkill(input) {
   ensureFixedSkillSectionLayout(draft)
   removeSkillCallerDescription(draft)
 
+  // 在正式生成前，必须保证目标 skill 的正文能收束为固定六块，且不残留“由谁调用该 skill”的描述。
   // Output: 返回目标 skill 的新增或修改结果，以及清理调用者描述后的最终草案。
   return finalizeSkillDraft(draft)
 }
