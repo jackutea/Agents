@@ -17,20 +17,7 @@ bootstrap-agent.skill 只负责 agent 文件本身的创建、修改、补全与
 - 当任务涉及 header 或 frontmatter 时，先向用户问询，再继续正文修改。
 - 当任务会连带影响 skill 时，先列出 skill 清单并等待用户选择，再进入对应 skill 处理。
 - 在信息充分后，产出结构清晰、边界明确、可直接使用的 agent 文件。
-
-本 skill 适用于以下情况：
-
-- 用户要求创建新的 agent。
-- 用户要求修改、重写、收敛或扩展已有 agent。
-- 用户要求完善 agent 的职责、边界、工作流、限制条件或说明文本。
-
-本 skill 不适用于以下情况：
-
-- 只是修改普通代码文件，而不是 agent 文件。
-- 只是解释 agent 概念，没有要求落地到文件。
-- 只是修复运行时代码错误，且问题不在 agent 定义本身。
-
-若用户提供的信息不足以可靠完成 agent 文件，必须先返回缺失项并向用户提问，而不是自行脑补。
+- 仅适用于 agent 文件本身的创建、修改、重写、收束与说明补全；不处理普通业务代码，也不替代运行时代码修复。
 
 ## agents清单
 
@@ -46,13 +33,12 @@ bootstrap-agent.skill 只负责 agent 文件本身的创建、修改、补全与
 
 ## 任务编排
 
-bootstrap-agent.skill 的任务编排是先确认输入与任务类型，再整理调用清单，检查 header 与 skill 门禁，最后产出可直接使用的 agent 正文。
-
 伪代码如下：
 
 ```text
 bootstrapAgent(input) {
-	// Input: 用户提供的 agent 目标、边界、调用方、工具限制、header 变更需求、skill 影响范围。
+	// Input 是用户提供的 agent 目标、边界、调用方、工具限制、header 变更需求、skill 影响范围。
+	// 只处理 agent 文件本身；若任务实际是普通代码修改、纯概念解释或运行时代码修复，应直接返回改派建议。
 	var taskType = decideAgentTaskType(input)
 	var agentSpec = collectAgentSpec(input)
 
@@ -74,6 +60,7 @@ bootstrapAgent(input) {
 		return askUserToSelectSkills(agentSpec)
 	}
 
+	// 在正式生成前，必须保证目标 agent 的正文能收束为固定六块，且调用清单显式可读。
 	// 调用的 agents: 无固定下游 agent，本 skill 自身负责 agent 结构整理。
 	// 调用的 skills: 无固定下游 skill，只在需要时先列出 skill 清单供用户选择。
 	var draft = buildOrUpdateAgent(taskType, agentSpec)
@@ -84,43 +71,15 @@ bootstrapAgent(input) {
 
 ## 强制约束
 
-执行本 skill 时，必须满足以下强制约束：
-
-禁止参考以下项目内文档：
-
-- 已有的 agent 文件
-- 已有的 skill 文件
-- 已有的 instructions 文件
-- 已有的 prompt 文件
-- 其他说明性 Markdown 文档
-
-禁止把上面这些项目内文档作为参考来源；允许使用的信息来源只有：
-
-- 用户当前明确提供的要求
-- 当前正在编辑的目标 agent 文件本身
-- 通用的 agent 设计原则
-- 官方能力或平台约束
-
-如果缺少信息，不要通过搜索项目文档补足；应直接向用户提问。
-
-凡是通过本 skill 创建或修改的 agent，正文都必须明确包含以下结构：
-
-- 职责
-- 调用的 agent 清单
-- 调用的 skill 清单
-- 任务编排
-- 强制约束
-- 质量标准
-
-由本 skill 创建或修改的目标 agent，应与本 skill 保持同样的正文组织方式，只保留以上六块内容；其他信息应收束进这六块中，而不是继续展开为额外的并列章节。
-
-其中：
-
+- 禁止参考项目内已有的 agent、skill、instructions、prompt 和其他说明性 Markdown 文档来补足需求。
+- 允许使用的信息来源只有用户当前明确提供的要求、当前正在编辑的目标 agent 文件本身、通用的 agent 设计原则、官方能力或平台约束。
+- 如果缺少信息，不要通过搜索项目文档补足；应直接向用户提问。
+- 凡是通过本 skill 创建或修改的 agent，正文都必须明确包含职责、调用的 agent 清单、调用的 skill 清单、任务编排、强制约束、质量标准六块结构。
+- 由本 skill 创建或修改的目标 agent，应与本 skill 保持同样的正文组织方式，只保留以上六块内容；其他信息应收束进这六块中，而不是继续展开为额外的并列章节。
 - 调用的 agent 清单与调用的 skill 清单必须是显式可读的结构，不能只在段落叙述里隐含提及。
 - 如果目标 agent 不调用其他 agent 或 skill，也必须明确写出空清单、兜底规则，或“不调用其他 agent / skill”的说明，不能留白。
 - 任务编排必须是独立章节，且必须明确体现 Input 如何进入编排、调用了哪些 agents、调用了哪些 skills、以及 Output 如何产出或汇总返回。
-- 任务编排必须包含伪代码，并允许使用注释加强说明。
-- 若任务编排只写成抽象流程，而没有明确 Input、调用对象或 Output，则视为不合格。
+- 任务编排必须包含伪代码，并允许使用注释加强说明；若只写成抽象流程，而没有明确 Input、调用对象或 Output，则视为不合格。
 - 涉及 header 时，未获确认前不得正式编辑 header。
 - 涉及 skill 时，未完成 skill 选择前不得进入 skill 改动。
 - 当用户提及 agent 时，默认同步评估对应 skill，不得把 skill 排除在评估之外。
@@ -144,6 +103,6 @@ bootstrapAgent(input) {
 - 不依赖项目内已有文档
 - 规则具体，可执行，不含含糊表述
 - 产物能直接用于后续编辑工作
-- 参考项目时，禁止出现参考项目名。
-- 任务编排必须包含伪代码。
-- 任务编排必须明确体现 Input、调用的 agents / skills、以及 Output。
+- 参考项目时，禁止出现参考项目名
+- 任务编排必须包含伪代码
+- 任务编排必须明确体现 Input、调用的 agents / skills、以及 Output
