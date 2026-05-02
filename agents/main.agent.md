@@ -48,7 +48,7 @@ main.agent 负责以下事项：
 6. 若输出仍是中间结果，则继续把结果输入给下一个合适的 agent，而不是过早结束。
 7. 若任务涉及创建 agent、修改 agent、维护 agent、完善 agent，则调用 bootstrap-agent.skill 处理该分支。
 8. 若任务涉及远端仓库创建或常见 Git 流程，例如 fetch、pull、add、commit、push、merge，则调用 git.agent 处理该分支。
-9. 若任务涉及 Unity 项目初始化或基础文本资源文件生成，则调用 unity.agent 处理该分支。
+9. 若任务涉及 Main 部分代码编写、项目创建或项目信息维护，则调用 program.main.agent 处理该分支。
 10. 若任务涉及 Unity 策划相关内容，例如 ScriptableObject 资源创建与维护，则调用 unity.gamedesign.agent 处理该分支。
 11. 若任务涉及 Unity 内部美术内容，例如 animation、animator、render、prefab，则调用 unity.art.agent 处理该分支。
 12. 若任务涉及 module 级程序编写、通用 C# 模块实现，或需要承接 Unity C# 编程分派，则调用 program.module.agent 处理该分支。
@@ -117,8 +117,8 @@ main(input) {
       results.push(bootstrap-agent.skill(route))
     } else if (route.type == "agent-git") {
       results.push(git.agent(route))
-    } else if (route.type == "agent-unity") {
-      results.push(unity.agent(route))
+    } else if (route.type == "agent-program-main") {
+      results.push(program.main.agent(route))
     } else if (route.type == "agent-unity-gamedesign") {
       results.push(unity.gamedesign.agent(route))
     } else if (route.type == "agent-unity-art") {
@@ -147,7 +147,7 @@ main(input) {
 
 - `main.agent` 先调用的是 `milestone.agent`，不是其他执行 agent。
 - `bootstrap-agent.skill` 是 skill，不是 agent；在创建或维护 agent 场景下由 `main.agent` 直接调用。
-- `git.agent`、`unity.agent`、`unity.gamedesign.agent`、`unity.art.agent`、`program.module.agent`、`style-review.agent`、`performance.agent` 和 `turnover.agent` 是执行型 agent，由 `main.agent` 按路由结果调用。
+- `git.agent`、`program.main.agent`、`unity.gamedesign.agent`、`unity.art.agent`、`program.module.agent`、`style-review.agent`、`performance.agent` 和 `turnover.agent` 是执行型 agent，由 `main.agent` 按路由结果调用。
 - 涉及项目配置时，必须先读取或维护 `project.config.json`，再进入后续编排。
 - `turnover.agent` 只负责原样追加记录原始输入与原始输出，且不能读取日志文件。
 
@@ -191,14 +191,14 @@ main(input) {
 - 返回的输出：Git 操作结果、当前状态、失败原因、冲突信息、下一步建议
 - 后续衔接：若 git.agent 返回最终 Git 处理结果，则由 main.agent 汇总反馈；若返回冲突或阻塞，则由 main.agent 继续向用户确认或分派后续处理
 
-### unity.agent
+### program.main.agent
 
-- Agent 名称：unity.agent
-- 适用任务：Unity 项目初始化(`.gitignore`、`.editorconfig`)、基础文本资源文件生成，以及 Unity 策划 / C# 任务的前置识别与转派
-- 触发条件：当任务目标明确属于 Unity 工程搭建、基础文本资源生成，或需要先从 Unity 侧识别策划 / C# 分派任务时
-- 接收的输入：Unity 版本、项目路径、资源路径、命名规则、渲染管线、目标资源类型及其他上下文
-- 返回的输出：Unity 文件创建结果、所调用的 skill 或下游 agent、当前阻塞项、缺失信息、下一步建议
-- 后续衔接：若 unity.agent 返回最终 Unity 资源结果，则由 main.agent 汇总反馈；若返回阻塞，则由 main.agent 继续向用户补问或分派后续处理
+- Agent 名称：program.main.agent
+- 适用任务：Main 部分代码编写、项目创建、项目信息维护
+- 触发条件：当任务目标明确属于主入口类实现、项目结构初始化、`project.config.json` 维护或项目级参数整理时
+- 接收的输入：入口类名称、路径、生命周期要求、依赖清单、项目根目录、Unity 版本、目标平台、项目级参数及其他上下文
+- 返回的输出：Main 代码或项目级文件处理结果、所调用的 skill、当前阻塞项、缺失信息、下一步建议
+- 后续衔接：若 program.main.agent 返回最终项目级结果，则由 main.agent 汇总反馈；若返回阻塞，则由 main.agent 继续向用户补问或分派后续处理
 
 ### unity.gamedesign.agent
 
@@ -222,7 +222,7 @@ main(input) {
 
 - Agent 名称：program.module.agent
 - 适用任务：module 级程序编写、通用 C# 模块实现，以及承接 Unity C# 编程分派
-- 触发条件：当任务目标明确属于 module 编写、module 重构、module 拆分、module 接线，或由 unity.agent 转入 Unity C# 编程时
+- 触发条件：当任务目标明确属于 module 编写、module 重构、module 拆分、module 接线，或由上游项目级 agent 转入 Unity C# 编程时
 - 接收的输入：目标模块名称、路径、职责边界、命名空间、依赖关系、脚本用途及其他上下文
 - 返回的输出：module 编写结果、调用的 skill、当前阻塞项、缺失信息、下一步建议
 - 后续衔接：若 program.module.agent 返回最终代码结果，则由 main.agent 汇总反馈；若返回阻塞，则由 main.agent 继续向用户补问或分派后续处理
@@ -308,7 +308,7 @@ main.agent 必须先获得：
 - 是否需要多个 agent 并行处理再汇总
 - 是否暂时不能分派，必须先补问用户
 - 是否应交给 git.agent 处理 Git 或远端仓库相关任务
-- 是否应交给 unity.agent 处理 Unity 相关任务
+- 是否应交给 program.main.agent 处理 Main 代码、项目创建或项目信息维护任务
 - 是否应交给 unity.gamedesign.agent 处理 Unity 策划相关任务
 - 是否应交给 unity.art.agent 处理 Unity 内部美术内容
 - 是否应交给 program.module.agent 处理 module 级程序编写或 C# 模块任务
@@ -358,11 +358,11 @@ main.agent 必须先获得：
 - 让用户自行解决
 - 由 AI 协助解决
 
-### 第十步：委派 unity.agent
+### 第十步：委派 program.main.agent
 
-当请求属于 Unity 项目初始化、`.gitignore`、`.editorconfig` 或基础文本资源任务时，应调用 unity.agent。
+当请求属于 Main 部分代码编写、项目创建、`.gitignore`、`.editorconfig` 或项目信息维护时，应调用 program.main.agent。
 
-若任务包含 `.gitignore`，则 main.agent 必须确保 unity.agent 先向用户确认 Unity 版本。
+若任务包含 `.gitignore`，则 main.agent 必须确保 program.main.agent 先向用户确认 Unity 版本。
 
 ### 第十一步：委派 unity.gamedesign.agent
 
@@ -374,7 +374,7 @@ main.agent 必须先获得：
 
 ### 第十三步：委派 program.module.agent
 
-当请求属于 module 级程序编写、通用 C# 模块实现，或 Unity C# 编程职责已从 unity.agent 转派出来时，应调用 program.module.agent。
+当请求属于 module 级程序编写、通用 C# 模块实现，或 Unity C# 编程职责已从项目级 agent 转派出来时，应调用 program.module.agent。
 
 ### 第十四步：委派 style-review.agent
 
@@ -410,7 +410,7 @@ main.agent 必须先获得：
 - 创建或维护 `project.config.json` 时，必须基于 `/gists/project.config.json.gist.md`，并逐项向用户核对配置值。
 - 当任务属于 agent 创建或维护时，委派执行面固定为 bootstrap-agent.skill。
 - 当任务属于 Git 或远端仓库操作时，委派执行面固定为 git.agent。
-- 当任务属于 Unity 项目或 Unity 资源操作时，委派执行面固定为 unity.agent。
+- 当任务属于 Main 代码、项目创建或项目信息维护时，委派执行面固定为 program.main.agent。
 - 当任务属于 Unity 策划相关内容时，委派执行面固定为 unity.gamedesign.agent。
 - 当任务属于 Unity 内部美术内容时，委派执行面固定为 unity.art.agent。
 - 当任务属于 module 级程序编写或 C# 模块实现时，委派执行面固定为 program.module.agent。
@@ -432,7 +432,7 @@ main.agent 必须先获得：
 - 能在需要时按 gist 模板逐项核对后创建或维护 `project.config.json`
 - 能在 agent 创建或维护场景下正确调用 bootstrap-agent.skill
 - 能在 Git 或远端仓库场景下正确调用 git.agent
-- 能在 Unity 场景下正确调用 unity.agent
+- 能在 Main 代码、项目创建或项目信息维护场景下正确调用 program.main.agent
 - 能在 Unity 策划场景下正确调用 unity.gamedesign.agent
 - 能在 Unity 内部美术场景下正确调用 unity.art.agent
 - 能在 module 编写或 C# 模块场景下正确调用 program.module.agent

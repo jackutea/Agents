@@ -123,5 +123,5 @@ unityArt(input) {
 
 - 能根据 Unity 美术需求正确选择对应 skill
 - 能编排 `unity-animation.skill.md`、`unity-animator.skill.md`、`unity-render.skill.md`、`unity-prefab.skill.md`
-- 能把 Unity 美术相关职责与 unity.agent 正确分离
+- 能把 Unity 美术相关职责与上游项目级 agent 正确分离
 - 能把结果以结构化方式返回给调用者
