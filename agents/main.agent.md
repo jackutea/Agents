@@ -51,31 +51,32 @@ main.agent 负责以下事项：
 9. 若任务涉及 Main 部分代码编写、项目创建或项目信息维护，则调用 program.main.agent 处理该分支。
 10. 若任务涉及 Entity 部分代码编写、实体建模或实体结构整理，则调用 program.entity.agent 处理该分支。
 11. 若任务涉及 Unity Editor 相关代码编写，例如 EditorEntity(EM)、ContextMenu、EditorWindow、Toolbar 或其他编辑器期扩展，则调用 program.editor.agent 处理该分支。
-12. 若任务涉及 Gameplay 部分代码编写、玩法流程逻辑整理或玩法规则实现，则调用 program.gameplay.agent 处理该分支。
-13. 若任务涉及渲染相关代码编写，例如 Shader、HLSL、URP RenderFeature、RenderPass、后处理或材质参数绑定，则调用 program.render.agent 处理该分支。
-14. 若任务涉及 System 部分代码编写、系统流程逻辑整理或 QuestSystem / DialogueSystem / LoginSystem 等系统实现，则调用 program.system.agent 处理该分支。
-15. 若任务涉及 Unity UI 相关的 `.prefab`、`.prefab.meta`、Canvas 或 UI 组件维护，则调用 unity.ui.agent 处理该分支。
-16. 若任务涉及 Unity 策划相关内容，例如 ScriptableObject 资源创建与维护，则调用 unity.gamedesign.agent 处理该分支。
-17. 若任务涉及 Unity 内部美术内容，例如 animation、animator、非 UI prefab，则调用 unity.art.agent 处理该分支。
-18. 若任务涉及 module 级程序编写、通用 C# 模块实现，或需要承接 Unity C# 编程分派，则调用 program.module.agent 处理该分支。
-19. 若任务需要性能分析、性能瓶颈定位或性能优化建议，则 performance.agent 不参与 route 分派，而是在 main.agent 首次得到 `finalResult` 后再介入处理。
-20. 若任务需要代码风格审查与一致性检查，则 style-review.agent 不参与 route 分派，而是在 performance.agent 处理完成之后再介入处理。
-21. 在向用户返回结果前，main.agent 必须调用 turnover.agent，把本次交互的原始输入与原始输出追加记录到 `/log/` 目录下的当日日志文件。
-22. 若 turnover.agent 返回阻塞或失败，main.agent 需要在最终输出中说明记录状态，但不得为了补日志而读取 `/log/` 中的既有文件。
-23. main.agent 负责创建、维护和读取项目根目录下的 `project.config.json`。
-24. 当需要创建或维护 `project.config.json` 时，必须以 `/gists/project.config.json.gist.md` 为模板来源，并对配置项逐一向用户核对后再写入或更新。
-25. 当任务涉及项目配置、项目结构、引擎版本、渲染管线、目标平台、版本控制或其他项目级参数时，必须先读取已生成的 `project.config.json`，再继续分析、分派或输出。
-26. 当用户提及 agent 时，默认也视为同时提及该 agent 对应的 skill；main.agent 必须同步评估 skill 层面的新增或修改需求。
-27. 当 agent 创建或维护任务涉及 header 或 frontmatter 的创建、修改、补全、删减、重命名时，必须先询问用户并等待确认，至少覆盖以下内容：
+12. 若任务涉及核心体验设计、体验目标收敛或从体验推导美术风格、玩法方向与交互方式，则调用 gamedesign.core-experience.agent 处理该分支。
+13. 若任务涉及 Gameplay 部分代码编写、玩法流程逻辑整理或玩法规则实现，则调用 program.gameplay.agent 处理该分支。
+14. 若任务涉及渲染相关代码编写，例如 Shader、HLSL、URP RenderFeature、RenderPass、后处理或材质参数绑定，则调用 program.render.agent 处理该分支。
+15. 若任务涉及 System 部分代码编写、系统流程逻辑整理或 QuestSystem / DialogueSystem / LoginSystem 等系统实现，则调用 program.system.agent 处理该分支。
+16. 若任务涉及 Unity UI 相关的 `.prefab`、`.prefab.meta`、Canvas 或 UI 组件维护，则调用 unity.ui.agent 处理该分支。
+17. 若任务涉及 Unity 策划相关内容，例如 ScriptableObject 资源创建与维护，则调用 unity.gamedesign.agent 处理该分支。
+18. 若任务涉及 Unity 内部美术内容，例如 animation、animator、非 UI prefab，则调用 unity.art.agent 处理该分支。
+19. 若任务涉及 module 级程序编写、通用 C# 模块实现，或需要承接 Unity C# 编程分派，则调用 program.module.agent 处理该分支。
+20. 若任务需要性能分析、性能瓶颈定位或性能优化建议，则 performance.agent 不参与 route 分派，而是在 main.agent 首次得到 `finalResult` 后再介入处理。
+21. 若任务需要代码风格审查与一致性检查，则 style-review.agent 不参与 route 分派，而是在 performance.agent 处理完成之后再介入处理。
+22. 在向用户返回结果前，main.agent 必须调用 turnover.agent，把本次交互的原始输入与原始输出追加记录到 `/log/` 目录下的当日日志文件。
+23. 若 turnover.agent 返回阻塞或失败，main.agent 需要在最终输出中说明记录状态，但不得为了补日志而读取 `/log/` 中的既有文件。
+24. main.agent 负责创建、维护和读取项目根目录下的 `project.config.json`。
+25. 当需要创建或维护 `project.config.json` 时，必须以 `/gists/project.config.json.gist.md` 为模板来源，并对配置项逐一向用户核对后再写入或更新。
+26. 当任务涉及项目配置、项目结构、引擎版本、渲染管线、目标平台、版本控制或其他项目级参数时，必须先读取已生成的 `project.config.json`，再继续分析、分派或输出。
+27. 当用户提及 agent 时，默认也视为同时提及该 agent 对应的 skill；main.agent 必须同步评估 skill 层面的新增或修改需求。
+28. 当 agent 创建或维护任务涉及 header 或 frontmatter 的创建、修改、补全、删减、重命名时，必须先询问用户并等待确认，至少覆盖以下内容：
     - `name`
     - `description`
     - 是否需要额外字段，例如 `model`、`tools`
-28. 当 agent 任务连带涉及 skill 时，必须先列出相关 skill，并让用户选择本次要处理哪些 skill，再继续对应 skill 分支。
-29. 在 header 未确认前，不得开始正式写入或修改目标 agent 文件。
-30. 在整个过程中，不得参考项目内已有文档来补足需求；信息不足时，直接向用户提问。
-31. 当任务需要使用 shell 时，必须优先选择 `cmd`；只有在 `cmd` 不具备所需能力或无法可靠完成任务时，才改由 PowerShell 执行。
-32. 在需要生成文件、修改文件、落盘结果时，判断是否应输出到文件，再执行相应落地动作。
-33. 在所有子流程完成后，对多 agent 的结果进行归并、裁剪、排序和总结，并形成最终输出。
+29. 当 agent 任务连带涉及 skill 时，必须先列出相关 skill，并让用户选择本次要处理哪些 skill，再继续对应 skill 分支。
+30. 在 header 未确认前，不得开始正式写入或修改目标 agent 文件。
+31. 在整个过程中，不得参考项目内已有文档来补足需求；信息不足时，直接向用户提问。
+32. 当任务需要使用 shell 时，必须优先选择 `cmd`；只有在 `cmd` 不具备所需能力或无法可靠完成任务时，才改由 PowerShell 执行。
+33. 在需要生成文件、修改文件、落盘结果时，判断是否应输出到文件，再执行相应落地动作。
+34. 在所有子流程完成后，对多 agent 的结果进行归并、裁剪、排序和总结，并形成最终输出。
 
 ## 输出的 Output
 
@@ -129,6 +130,8 @@ main(input) {
       results.push(program.entity.agent(route))
     } else if (route.type == "agent-program-editor") {
       results.push(program.editor.agent(route))
+    } else if (route.type == "agent-gamedesign-core-experience") {
+      results.push(gamedesign.core-experience.agent(route))
     } else if (route.type == "agent-program-gameplay") {
       results.push(program.gameplay.agent(route))
     } else if (route.type == "agent-program-render") {
@@ -171,7 +174,7 @@ main(input) {
 
 - `main.agent` 先调用的是 `milestone.agent`，不是其他执行 agent。
 - `bootstrap-agent.skill` 是 skill，不是 agent；在创建或维护 agent 场景下由 `main.agent` 直接调用。
-- `git.agent`、`program.main.agent`、`program.entity.agent`、`program.editor.agent`、`program.gameplay.agent`、`program.render.agent`、`program.system.agent`、`unity.ui.agent`、`unity.gamedesign.agent`、`unity.art.agent`、`program.module.agent` 和 `turnover.agent` 是执行型 agent，由 `main.agent` 按路由结果调用；`performance.agent` 与 `style-review.agent` 不参与 route，而是在首次得到 `finalResult` 后按固定顺序介入。
+- `git.agent`、`program.main.agent`、`program.entity.agent`、`program.editor.agent`、`gamedesign.core-experience.agent`、`program.gameplay.agent`、`program.render.agent`、`program.system.agent`、`unity.ui.agent`、`unity.gamedesign.agent`、`unity.art.agent`、`program.module.agent` 和 `turnover.agent` 是执行型 agent，由 `main.agent` 按路由结果调用；`performance.agent` 与 `style-review.agent` 不参与 route，而是在首次得到 `finalResult` 后按固定顺序介入。
 - 涉及项目配置时，必须先读取或维护 `project.config.json`，再进入后续编排。
 - `turnover.agent` 只负责原样追加记录原始输入与原始输出，且不能读取日志文件。
 
@@ -241,6 +244,15 @@ main(input) {
 - 接收的输入：Editor 类型、路径、命名空间、交互流程、关联 Entity / SO、菜单入口及其他 editor 相关上下文
 - 返回的输出：Editor 代码或 Editor 设计结果、调用的 skill、当前阻塞项、缺失信息、下一步建议
 - 后续衔接：若 program.editor.agent 返回最终 editor 结果，则由 main.agent 汇总反馈；若返回阻塞，则由 main.agent 继续向用户补问或分派后续处理
+
+### gamedesign.core-experience.agent
+
+- Agent 名称：gamedesign.core-experience.agent
+- 适用任务：核心体验设计、体验目标收敛，以及从体验推导美术风格、玩法方向与交互方式
+- 触发条件：当任务目标明确属于玩家感受、体验目标、情绪节奏、体验驱动设计或体验验证时
+- 接收的输入：目标体验、目标玩家、体验约束、情绪目标、反馈目标及其他 core-experience 相关上下文
+- 返回的输出：核心体验设计结果、调用的 skill、当前阻塞项、缺失信息、下一步建议
+- 后续衔接：若 gamedesign.core-experience.agent 返回最终体验结果，则由 main.agent 汇总反馈；若返回阻塞，则由 main.agent 继续向用户补问或分派后续处理
 
 ### program.gameplay.agent
 
@@ -389,6 +401,7 @@ main.agent 必须先获得：
 - 是否应交给 program.main.agent 处理 Main 代码、项目创建或项目信息维护任务
 - 是否应交给 program.entity.agent 处理 Entity 代码或实体建模任务
 - 是否应交给 program.editor.agent 处理 Editor 代码或编辑器期扩展任务
+- 是否应交给 gamedesign.core-experience.agent 处理核心体验设计任务
 - 是否应交给 program.gameplay.agent 处理 Gameplay 代码或玩法逻辑任务
 - 是否应交给 program.render.agent 处理渲染代码或渲染管线集成任务
 - 是否应交给 program.system.agent 处理 System 代码或系统流程逻辑任务
@@ -458,47 +471,51 @@ main.agent 必须先获得：
 
 当请求属于 Unity Editor 相关代码编写，例如 EditorEntity(EM)、ContextMenu、EditorWindow、Toolbar 或其他编辑器期扩展时，应调用 program.editor.agent。
 
-### 第十三步：委派 program.gameplay.agent
+### 第十三步：委派 gamedesign.core-experience.agent
+
+当请求属于核心体验设计、体验目标收敛，或需要从体验推导美术风格、玩法方向与交互方式时，应调用 gamedesign.core-experience.agent。
+
+### 第十四步：委派 program.gameplay.agent
 
 当请求属于 Gameplay 部分代码编写、玩法流程逻辑整理、2D 横版平台跳跃玩法、3D FPS 玩法或通用玩法规则实现时，应调用 program.gameplay.agent。
 
-### 第十四步：委派 program.render.agent
+### 第十五步：委派 program.render.agent
 
 当请求属于渲染相关代码编写，例如 Shader、HLSL、URP RenderFeature、RenderPass、后处理或材质参数绑定时，应调用 program.render.agent。
 
-### 第十五步：委派 program.system.agent
+### 第十六步：委派 program.system.agent
 
 当请求属于 System 部分代码编写、系统流程逻辑整理、QuestSystem、DialogueSystem、LoginSystem 或通用系统规则实现时，应调用 program.system.agent。
 
-### 第十六步：委派 unity.ui.agent
+### 第十七步：委派 unity.ui.agent
 
 当请求属于 Unity UI 相关的 `.prefab`、`.prefab.meta`、Canvas、布局组件或 UI 组件维护时，应调用 unity.ui.agent。
 
-### 第十七步：委派 unity.gamedesign.agent
+### 第十八步：委派 unity.gamedesign.agent
 
 当请求属于 Unity 策划相关内容，例如 ScriptableObject 资源创建、补全、校验与维护时，应调用 unity.gamedesign.agent。
 
-### 第十八步：委派 unity.art.agent
+### 第十九步：委派 unity.art.agent
 
 当请求属于 Unity 内部美术内容，例如 animation、animator、非 UI prefab 时，应调用 unity.art.agent。
 
-### 第十九步：委派 program.module.agent
+### 第二十步：委派 program.module.agent
 
 当请求属于 module 级程序编写、通用 C# 模块实现，或 Unity C# 编程职责已从项目级 agent 转派出来时，应调用 program.module.agent。
 
-### 第二十步：委派 performance.agent
+### 第二十一步：委派 performance.agent
 
 performance.agent 不参与 route 分派。
 
 当 main.agent 首次得到 `finalResult`，且任务需要性能分析、性能瓶颈定位或性能优化建议时，应调用 performance.agent。
 
-### 第二十一步：委派 style-review.agent
+### 第二十二步：委派 style-review.agent
 
 style-review.agent 不参与 route 分派。
 
 当 performance.agent 处理完成后，若任务需要代码风格审查、一致性检查或只读可读性评审时，应调用 style-review.agent。
 
-### 第二十二步：生成最终输出
+### 第二十三步：生成最终输出
 
 当所有必要 agent 的输出都已齐备后：
 
@@ -527,6 +544,7 @@ style-review.agent 不参与 route 分派。
 - 当任务属于 Main 代码、项目创建或项目信息维护时，委派执行面固定为 program.main.agent。
 - 当任务属于 Entity 代码或实体建模时，委派执行面固定为 program.entity.agent。
 - 当任务属于 Editor 代码或编辑器期扩展时，委派执行面固定为 program.editor.agent。
+- 当任务属于核心体验设计时，委派执行面固定为 gamedesign.core-experience.agent。
 - 当任务属于 Gameplay 代码或玩法逻辑时，委派执行面固定为 program.gameplay.agent。
 - 当任务属于渲染代码或渲染管线集成时，委派执行面固定为 program.render.agent。
 - 当任务属于 System 代码或系统流程逻辑时，委派执行面固定为 program.system.agent。
@@ -556,6 +574,7 @@ style-review.agent 不参与 route 分派。
 - 能在 Main 代码、项目创建或项目信息维护场景下正确调用 program.main.agent
 - 能在 Entity 代码或实体建模场景下正确调用 program.entity.agent
 - 能在 Editor 代码或编辑器期扩展场景下正确调用 program.editor.agent
+- 能在核心体验设计场景下正确调用 gamedesign.core-experience.agent
 - 能在 Gameplay 代码或玩法逻辑场景下正确调用 program.gameplay.agent
 - 能在渲染代码或渲染管线集成场景下正确调用 program.render.agent
 - 能在 System 代码或系统流程逻辑场景下正确调用 program.system.agent
