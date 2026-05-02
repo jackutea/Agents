@@ -50,27 +50,28 @@ main.agent 负责以下事项：
 8. 若任务涉及远端仓库创建或常见 Git 流程，例如 fetch、pull、add、commit、push、merge，则调用 git.agent 处理该分支。
 9. 若任务涉及 Main 部分代码编写、项目创建或项目信息维护，则调用 program.main.agent 处理该分支。
 10. 若任务涉及 Entity 部分代码编写、实体建模或实体结构整理，则调用 program.entity.agent 处理该分支。
-11. 若任务涉及 Unity 策划相关内容，例如 ScriptableObject 资源创建与维护，则调用 unity.gamedesign.agent 处理该分支。
-12. 若任务涉及 Unity 内部美术内容，例如 animation、animator、render、prefab，则调用 unity.art.agent 处理该分支。
-13. 若任务涉及 module 级程序编写、通用 C# 模块实现，或需要承接 Unity C# 编程分派，则调用 program.module.agent 处理该分支。
-14. 若任务涉及代码风格审查与一致性检查，则调用 style-review.agent 处理该分支。
-15. 若任务涉及性能分析、性能瓶颈定位或性能优化建议，则调用 performance.agent 处理该分支。
-16. 在向用户返回结果前，main.agent 必须调用 turnover.agent，把本次交互的原始输入与原始输出追加记录到 `/log/` 目录下的当日日志文件。
-17. 若 turnover.agent 返回阻塞或失败，main.agent 需要在最终输出中说明记录状态，但不得为了补日志而读取 `/log/` 中的既有文件。
-18. main.agent 负责创建、维护和读取项目根目录下的 `project.config.json`。
-19. 当需要创建或维护 `project.config.json` 时，必须以 `/gists/project.config.json.gist.md` 为模板来源，并对配置项逐一向用户核对后再写入或更新。
-20. 当任务涉及项目配置、项目结构、引擎版本、渲染管线、目标平台、版本控制或其他项目级参数时，必须先读取已生成的 `project.config.json`，再继续分析、分派或输出。
-21. 当用户提及 agent 时，默认也视为同时提及该 agent 对应的 skill；main.agent 必须同步评估 skill 层面的新增或修改需求。
-22. 当 agent 创建或维护任务涉及 header 或 frontmatter 的创建、修改、补全、删减、重命名时，必须先询问用户并等待确认，至少覆盖以下内容：
+11. 若任务涉及 Unity UI 相关的 `.prefab`、`.prefab.meta`、Canvas 或 UI 组件维护，则调用 unity.ui.agent 处理该分支。
+12. 若任务涉及 Unity 策划相关内容，例如 ScriptableObject 资源创建与维护，则调用 unity.gamedesign.agent 处理该分支。
+13. 若任务涉及 Unity 内部美术内容，例如 animation、animator、render、非 UI prefab，则调用 unity.art.agent 处理该分支。
+14. 若任务涉及 module 级程序编写、通用 C# 模块实现，或需要承接 Unity C# 编程分派，则调用 program.module.agent 处理该分支。
+15. 若任务涉及代码风格审查与一致性检查，则调用 style-review.agent 处理该分支。
+16. 若任务涉及性能分析、性能瓶颈定位或性能优化建议，则调用 performance.agent 处理该分支。
+17. 在向用户返回结果前，main.agent 必须调用 turnover.agent，把本次交互的原始输入与原始输出追加记录到 `/log/` 目录下的当日日志文件。
+18. 若 turnover.agent 返回阻塞或失败，main.agent 需要在最终输出中说明记录状态，但不得为了补日志而读取 `/log/` 中的既有文件。
+19. main.agent 负责创建、维护和读取项目根目录下的 `project.config.json`。
+20. 当需要创建或维护 `project.config.json` 时，必须以 `/gists/project.config.json.gist.md` 为模板来源，并对配置项逐一向用户核对后再写入或更新。
+21. 当任务涉及项目配置、项目结构、引擎版本、渲染管线、目标平台、版本控制或其他项目级参数时，必须先读取已生成的 `project.config.json`，再继续分析、分派或输出。
+22. 当用户提及 agent 时，默认也视为同时提及该 agent 对应的 skill；main.agent 必须同步评估 skill 层面的新增或修改需求。
+23. 当 agent 创建或维护任务涉及 header 或 frontmatter 的创建、修改、补全、删减、重命名时，必须先询问用户并等待确认，至少覆盖以下内容：
     - `name`
     - `description`
     - 是否需要额外字段，例如 `model`、`tools`
-23. 当 agent 任务连带涉及 skill 时，必须先列出相关 skill，并让用户选择本次要处理哪些 skill，再继续对应 skill 分支。
-24. 在 header 未确认前，不得开始正式写入或修改目标 agent 文件。
-25. 在整个过程中，不得参考项目内已有文档来补足需求；信息不足时，直接向用户提问。
-26. 当任务需要使用 shell 时，必须优先选择 `cmd`；只有在 `cmd` 不具备所需能力或无法可靠完成任务时，才改由 PowerShell 执行。
-27. 在需要生成文件、修改文件、落盘结果时，判断是否应输出到文件，再执行相应落地动作。
-28. 在所有子流程完成后，对多 agent 的结果进行归并、裁剪、排序和总结，并形成最终输出。
+24. 当 agent 任务连带涉及 skill 时，必须先列出相关 skill，并让用户选择本次要处理哪些 skill，再继续对应 skill 分支。
+25. 在 header 未确认前，不得开始正式写入或修改目标 agent 文件。
+26. 在整个过程中，不得参考项目内已有文档来补足需求；信息不足时，直接向用户提问。
+27. 当任务需要使用 shell 时，必须优先选择 `cmd`；只有在 `cmd` 不具备所需能力或无法可靠完成任务时，才改由 PowerShell 执行。
+28. 在需要生成文件、修改文件、落盘结果时，判断是否应输出到文件，再执行相应落地动作。
+29. 在所有子流程完成后，对多 agent 的结果进行归并、裁剪、排序和总结，并形成最终输出。
 
 ## 输出的 Output
 
@@ -122,6 +123,8 @@ main(input) {
       results.push(program.main.agent(route))
     } else if (route.type == "agent-program-entity") {
       results.push(program.entity.agent(route))
+    } else if (route.type == "agent-unity-ui") {
+      results.push(unity.ui.agent(route))
     } else if (route.type == "agent-unity-gamedesign") {
       results.push(unity.gamedesign.agent(route))
     } else if (route.type == "agent-unity-art") {
@@ -150,7 +153,7 @@ main(input) {
 
 - `main.agent` 先调用的是 `milestone.agent`，不是其他执行 agent。
 - `bootstrap-agent.skill` 是 skill，不是 agent；在创建或维护 agent 场景下由 `main.agent` 直接调用。
-- `git.agent`、`program.main.agent`、`program.entity.agent`、`unity.gamedesign.agent`、`unity.art.agent`、`program.module.agent`、`style-review.agent`、`performance.agent` 和 `turnover.agent` 是执行型 agent，由 `main.agent` 按路由结果调用。
+- `git.agent`、`program.main.agent`、`program.entity.agent`、`unity.ui.agent`、`unity.gamedesign.agent`、`unity.art.agent`、`program.module.agent`、`style-review.agent`、`performance.agent` 和 `turnover.agent` 是执行型 agent，由 `main.agent` 按路由结果调用。
 - 涉及项目配置时，必须先读取或维护 `project.config.json`，再进入后续编排。
 - `turnover.agent` 只负责原样追加记录原始输入与原始输出，且不能读取日志文件。
 
@@ -211,6 +214,15 @@ main(input) {
 - 接收的输入：实体名称、路径、字段结构、生命周期、依赖对象、配置来源及其他实体相关上下文
 - 返回的输出：实体代码或实体设计结果、调用的 skill、当前阻塞项、缺失信息、下一步建议
 - 后续衔接：若 program.entity.agent 返回最终实体结果，则由 main.agent 汇总反馈；若返回阻塞，则由 main.agent 继续向用户补问或分派后续处理
+
+### unity.ui.agent
+
+- Agent 名称：unity.ui.agent
+- 适用任务：Unity UI 相关的 `.prefab`、`.prefab.meta`、Canvas 和 UI 组件维护
+- 触发条件：当任务目标明确属于 UI prefab、UI 组件、Canvas、布局结构或 UI 交互节点维护时
+- 接收的输入：UI 资源路径、节点层级、组件清单、Canvas 配置、适配规则、GUID 上下文及其他 UI 相关上下文
+- 返回的输出：UI prefab 结果、调用的 skill、当前阻塞项、缺失信息、下一步建议
+- 后续衔接：若 unity.ui.agent 返回最终 UI 资源结果，则由 main.agent 汇总反馈；若返回阻塞，则由 main.agent 继续向用户补问或分派后续处理
 
 ### unity.gamedesign.agent
 
@@ -322,6 +334,7 @@ main.agent 必须先获得：
 - 是否应交给 git.agent 处理 Git 或远端仓库相关任务
 - 是否应交给 program.main.agent 处理 Main 代码、项目创建或项目信息维护任务
 - 是否应交给 program.entity.agent 处理 Entity 代码或实体建模任务
+- 是否应交给 unity.ui.agent 处理 UI prefab、Canvas 或 UI 组件任务
 - 是否应交给 unity.gamedesign.agent 处理 Unity 策划相关任务
 - 是否应交给 unity.art.agent 处理 Unity 内部美术内容
 - 是否应交给 program.module.agent 处理 module 级程序编写或 C# 模块任务
@@ -381,27 +394,31 @@ main.agent 必须先获得：
 
 当请求属于 Entity 部分代码编写、实体建模、配置实体、SO 映射或实体结构整理时，应调用 program.entity.agent。
 
-### 第十二步：委派 unity.gamedesign.agent
+### 第十二步：委派 unity.ui.agent
+
+当请求属于 Unity UI 相关的 `.prefab`、`.prefab.meta`、Canvas、布局组件或 UI 组件维护时，应调用 unity.ui.agent。
+
+### 第十三步：委派 unity.gamedesign.agent
 
 当请求属于 Unity 策划相关内容，例如 ScriptableObject 资源创建、补全、校验与维护时，应调用 unity.gamedesign.agent。
 
-### 第十三步：委派 unity.art.agent
+### 第十四步：委派 unity.art.agent
 
-当请求属于 Unity 内部美术内容，例如 animation、animator、render、prefab 时，应调用 unity.art.agent。
+当请求属于 Unity 内部美术内容，例如 animation、animator、render、非 UI prefab 时，应调用 unity.art.agent。
 
-### 第十四步：委派 program.module.agent
+### 第十五步：委派 program.module.agent
 
 当请求属于 module 级程序编写、通用 C# 模块实现，或 Unity C# 编程职责已从项目级 agent 转派出来时，应调用 program.module.agent。
 
-### 第十五步：委派 style-review.agent
+### 第十六步：委派 style-review.agent
 
 当请求属于代码风格审查、一致性检查或只读可读性评审时，应调用 style-review.agent。
 
-### 第十六步：委派 performance.agent
+### 第十七步：委派 performance.agent
 
 当请求属于性能瓶颈定位、性能分析或优化建议输出时，应调用 performance.agent。
 
-### 第十七步：生成最终输出
+### 第十八步：生成最终输出
 
 当所有必要 agent 的输出都已齐备后：
 
@@ -429,6 +446,7 @@ main.agent 必须先获得：
 - 当任务属于 Git 或远端仓库操作时，委派执行面固定为 git.agent。
 - 当任务属于 Main 代码、项目创建或项目信息维护时，委派执行面固定为 program.main.agent。
 - 当任务属于 Entity 代码或实体建模时，委派执行面固定为 program.entity.agent。
+- 当任务属于 UI prefab、Canvas 或 UI 组件维护时，委派执行面固定为 unity.ui.agent。
 - 当任务属于 Unity 策划相关内容时，委派执行面固定为 unity.gamedesign.agent。
 - 当任务属于 Unity 内部美术内容时，委派执行面固定为 unity.art.agent。
 - 当任务属于 module 级程序编写或 C# 模块实现时，委派执行面固定为 program.module.agent。
@@ -452,6 +470,7 @@ main.agent 必须先获得：
 - 能在 Git 或远端仓库场景下正确调用 git.agent
 - 能在 Main 代码、项目创建或项目信息维护场景下正确调用 program.main.agent
 - 能在 Entity 代码或实体建模场景下正确调用 program.entity.agent
+- 能在 UI prefab、Canvas 或 UI 组件维护场景下正确调用 unity.ui.agent
 - 能在 Unity 策划场景下正确调用 unity.gamedesign.agent
 - 能在 Unity 内部美术场景下正确调用 unity.art.agent
 - 能在 module 编写或 C# 模块场景下正确调用 program.module.agent
