@@ -33,11 +33,10 @@ program.main.agent 负责以下事项：
 2. 当任务涉及 Main 主入口类编写、初始化顺序、依赖注入、生命周期组织时，调用 `architecture-main.skill.md`。
 3. 当任务涉及上下文容器、依赖注册与注入边界时，调用 `architecture-context.skill.md`。
 4. 当任务涉及主入口相关架构分层、职责边界或设计约束时，调用 `architecture-design.skill.md`。
-5. 当任务涉及主入口依赖的实体或配置建模时，调用 `architecture-entity.skill.md`。
-6. 当任务涉及项目创建、目录结构初始化、`.gitignore`、`.editorconfig`、ProjectSettings 或基础脚本占位时，调用 `unity-create-project.skill.md`。
-7. 当任务涉及项目信息维护时，读取、创建或更新 `project.config.json`，并在写入前逐项核对配置值。
-8. 在执行前，检查项目根目录、Unity 版本、目标平台、入口类路径、生命周期要求和项目级参数是否齐全。
-9. 若信息不足，先向调用方返回缺失项和下一步建议。
+5. 当任务涉及项目创建、目录结构初始化、`.gitignore`、`.editorconfig`、ProjectSettings 或基础脚本占位时，调用 `unity-create-project.skill.md`。
+6. 当任务涉及项目信息维护时，读取、创建或更新 `project.config.json`，并在写入前逐项核对配置值。
+7. 在执行前，检查项目根目录、Unity 版本、目标平台、入口类路径、生命周期要求和项目级参数是否齐全。
+8. 若信息不足，先向调用方返回缺失项和下一步建议。
 
 ## 输出的 Output
 
@@ -72,9 +71,6 @@ programMain(input) {
 	}
 	if (includesArchitectureDesign(mainSpec)) {
 		results.push(architecture-design.skill(mainSpec))
-	}
-	if (includesEntityDesign(mainSpec)) {
-		results.push(architecture-entity.skill(mainSpec))
 	}
 	if (includesProjectCreation(mainSpec)) {
 		results.push(unity-create-project.skill(mainSpec))
@@ -111,7 +107,6 @@ programMain(input) {
 - Main 主入口代码：`architecture-main.skill.md`
 - 上下文与依赖注入：`architecture-context.skill.md`
 - 架构设计约束：`architecture-design.skill.md`
-- 实体与配置建模：`architecture-entity.skill.md`
 - 项目创建：`unity-create-project.skill.md`
 - 项目信息维护：维护 `project.config.json`
 
@@ -138,7 +133,6 @@ programMain(input) {
 - 能编排 `architecture-main.skill.md`
 - 能编排 `architecture-context.skill.md`
 - 能编排 `architecture-design.skill.md`
-- 能编排 `architecture-entity.skill.md`
 - 能承接项目创建任务并调用 `unity-create-project.skill.md`
 - 能承接项目信息维护并正确维护 `project.config.json`
 - 能把结果以结构化方式返回给调用者
