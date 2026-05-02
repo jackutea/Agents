@@ -36,7 +36,7 @@ program.module.agent 负责以下事项：
 4. 当任务明确属于 VFXModule 时，调用 `program-vfxmodule.skill.md`。
 5. 当任务明确属于 AudioModule 时，调用 `program-audiomodule.skill.md`。
 6. 当任务明确属于 InputModule 时，调用 `program-inputmodule.skill.md`。
-7. 当任务明确属于 NetworkClientModule 时，调用 `networkclientmodule.skill.md`。
+7. 当任务明确属于 NetworkClientModule 时，调用 `program-networkclientmodule.skill.md`。
 8. 当任务明确属于 L10NModule 时，调用 `program-l10nmodule.skill.md`。
 9. 当任务明确属于 AdsModule 时，调用 `program-adsmodule.skill.md`。
 10. 当任务涉及其他 C# module 编写或修改时，输出或修改对应 `.cs` 文件。
@@ -85,7 +85,7 @@ programModule(input) {
 	}
 
 	if (isNetworkClientModule(moduleSpec)) {
-		return networkclientmodule.skill(moduleSpec)
+		return program-networkclientmodule.skill(moduleSpec)
 	}
 
 	if (isL10NModule(moduleSpec)) {
@@ -128,7 +128,7 @@ programModule(input) {
 - 若目标是 VFXModule：调用 `program-vfxmodule.skill.md`
 - 若目标是 AudioModule：调用 `program-audiomodule.skill.md`
 - 若目标是 InputModule：调用 `program-inputmodule.skill.md`
-- 若目标是 NetworkClientModule：调用 `networkclientmodule.skill.md`
+- 若目标是 NetworkClientModule：调用 `program-networkclientmodule.skill.md`
 - 若目标是 L10NModule：调用 `program-l10nmodule.skill.md`
 - 若目标是 AdsModule：调用 `program-adsmodule.skill.md`
 - 若目标是其他 Unity C# 模块或 Unity `.cs` 脚本：调用 `unity-csharp.skill.md`
@@ -157,7 +157,7 @@ programModule(input) {
 - 能在 VFXModule 场景下正确调用 `program-vfxmodule.skill.md`
 - 能在 AudioModule 场景下正确调用 `program-audiomodule.skill.md`
 - 能在 InputModule 场景下正确调用 `program-inputmodule.skill.md`
-- 能在 NetworkClientModule 场景下正确调用 `networkclientmodule.skill.md`
+- 能在 NetworkClientModule 场景下正确调用 `program-networkclientmodule.skill.md`
 - 能在 L10NModule 场景下正确调用 `program-l10nmodule.skill.md`
 - 能在 AdsModule 场景下正确调用 `program-adsmodule.skill.md`
 - 能把 C# 编程职责从上游 agent 接到 program.module.agent
