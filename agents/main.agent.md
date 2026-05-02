@@ -47,7 +47,7 @@ main.agent 负责以下事项：
 5. 等待各 agent 的输出，并判断该输出是最终结果还是中间结果。
 6. 若输出仍是中间结果，则继续把结果输入给下一个合适的 agent，而不是过早结束。
 7. 若任务涉及创建 agent、修改 agent、维护 agent、完善 agent，则调用 bootstrap-agent.skill 处理该分支。
-8. 若任务涉及远端仓库创建或常见 Git 流程，例如 fetch、pull、add、commit、push、merge，则调用 git.agent 处理该分支。
+8. 若任务涉及远端仓库创建或常见 Git 流程，例如 fetch、pull、add、commit、push、merge，则调用 git.agent 处理该分支；若任务已被 milestone.agent 拆成多个 TODO，则每完成一个 Milestone 的 TODO 后，都需要调用一次 git.agent 处理对应的 Git 收口。
 9. 若任务涉及 Main 部分代码编写、项目创建或项目信息维护，则调用 program.main.agent 处理该分支。
 10. 若任务涉及 Entity 部分代码编写、实体建模或实体结构整理，则调用 program.entity.agent 处理该分支。
 11. 若任务涉及 Unity Editor 相关代码编写，例如 EditorEntity(EM)、ContextMenu、EditorWindow、Toolbar 或其他编辑器期扩展，则调用 program.editor.agent 处理该分支。
@@ -58,8 +58,8 @@ main.agent 负责以下事项：
 16. 若任务涉及 Unity 策划相关内容，例如 ScriptableObject 资源创建与维护，则调用 unity.gamedesign.agent 处理该分支。
 17. 若任务涉及 Unity 内部美术内容，例如 animation、animator、非 UI prefab，则调用 unity.art.agent 处理该分支。
 18. 若任务涉及 module 级程序编写、通用 C# 模块实现，或需要承接 Unity C# 编程分派，则调用 program.module.agent 处理该分支。
-19. 若任务涉及代码风格审查与一致性检查，则调用 style-review.agent 处理该分支。
-20. 若任务涉及性能分析、性能瓶颈定位或性能优化建议，则调用 performance.agent 处理该分支。
+19. 若任务需要性能分析、性能瓶颈定位或性能优化建议，则 performance.agent 不参与 route 分派，而是在 main.agent 首次得到 `finalResult` 后再介入处理。
+20. 若任务需要代码风格审查与一致性检查，则 style-review.agent 不参与 route 分派，而是在 performance.agent 处理完成之后再介入处理。
 21. 在向用户返回结果前，main.agent 必须调用 turnover.agent，把本次交互的原始输入与原始输出追加记录到 `/log/` 目录下的当日日志文件。
 22. 若 turnover.agent 返回阻塞或失败，main.agent 需要在最终输出中说明记录状态，但不得为了补日志而读取 `/log/` 中的既有文件。
 23. main.agent 负责创建、维护和读取项目根目录下的 `project.config.json`。
@@ -143,16 +143,22 @@ main(input) {
       results.push(unity.art.agent(route))
     } else if (route.type == "agent-program-module") {
       results.push(program.module.agent(route))
-    } else if (route.type == "agent-style-review") {
-      results.push(style-review.agent(route))
-    } else if (route.type == "agent-performance") {
-      results.push(performance.agent(route))
     } else {
       results.push(handleDirectTask(route))
+    }
+
+    if (isCompletedMilestoneTodo(route, milestoneResult)) {
+      results.push(git.agent(buildTodoGitRoute(route, milestoneResult)))
     }
   }
 
   var finalResult = summarizeResults(results)
+  if (needsPerformanceReview(input, finalResult)) {
+    finalResult = performance.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
+  }
+  if (needsStyleReview(input, finalResult)) {
+    finalResult = style-review.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
+  }
   if (needWriteFile(finalResult)) {
     writeFiles(finalResult)
   }
@@ -165,7 +171,7 @@ main(input) {
 
 - `main.agent` 先调用的是 `milestone.agent`，不是其他执行 agent。
 - `bootstrap-agent.skill` 是 skill，不是 agent；在创建或维护 agent 场景下由 `main.agent` 直接调用。
-- `git.agent`、`program.main.agent`、`program.entity.agent`、`program.editor.agent`、`program.gameplay.agent`、`program.render.agent`、`program.system.agent`、`unity.ui.agent`、`unity.gamedesign.agent`、`unity.art.agent`、`program.module.agent`、`style-review.agent`、`performance.agent` 和 `turnover.agent` 是执行型 agent，由 `main.agent` 按路由结果调用。
+- `git.agent`、`program.main.agent`、`program.entity.agent`、`program.editor.agent`、`program.gameplay.agent`、`program.render.agent`、`program.system.agent`、`unity.ui.agent`、`unity.gamedesign.agent`、`unity.art.agent`、`program.module.agent` 和 `turnover.agent` 是执行型 agent，由 `main.agent` 按路由结果调用；`performance.agent` 与 `style-review.agent` 不参与 route，而是在首次得到 `finalResult` 后按固定顺序介入。
 - 涉及项目配置时，必须先读取或维护 `project.config.json`，再进入后续编排。
 - `turnover.agent` 只负责原样追加记录原始输入与原始输出，且不能读取日志文件。
 
@@ -379,7 +385,7 @@ main.agent 必须先获得：
 - 是否需要多个 agent 串行处理
 - 是否需要多个 agent 并行处理再汇总
 - 是否暂时不能分派，必须先补问用户
-- 是否应交给 git.agent 处理 Git 或远端仓库相关任务
+- 是否应交给 git.agent 处理显式 Git 或远端仓库相关任务
 - 是否应交给 program.main.agent 处理 Main 代码、项目创建或项目信息维护任务
 - 是否应交给 program.entity.agent 处理 Entity 代码或实体建模任务
 - 是否应交给 program.editor.agent 处理 Editor 代码或编辑器期扩展任务
@@ -390,8 +396,8 @@ main.agent 必须先获得：
 - 是否应交给 unity.gamedesign.agent 处理 Unity 策划相关任务
 - 是否应交给 unity.art.agent 处理 Unity 内部美术内容
 - 是否应交给 program.module.agent 处理 module 级程序编写或 C# 模块任务
-- 是否应交给 style-review.agent 处理代码风格审查相关任务
-- 是否应交给 performance.agent 处理性能分析相关任务
+- 是否在首次得到 `finalResult` 后需要调用 performance.agent
+- 是否在 performance.agent 处理完成后需要调用 style-review.agent
 - 当用户提及 agent 时，是否也需要同步评估并列出对应 skill
 - 当任务需要 shell 时，`cmd` 是否已经足够完成；只有不足时才切换到 PowerShell
 
@@ -436,6 +442,8 @@ main.agent 必须先获得：
 - 让用户自行解决
 - 由 AI 协助解决
 
+若任务已被 milestone.agent 拆成多个 TODO，则每完成一个 Milestone 的 TODO 后，也必须调用一次 git.agent 处理该 TODO 对应的 Git 收口。
+
 ### 第十步：委派 program.main.agent
 
 当请求属于 Main 部分代码编写、项目创建、`.gitignore`、`.editorconfig` 或项目信息维护时，应调用 program.main.agent。
@@ -478,13 +486,17 @@ main.agent 必须先获得：
 
 当请求属于 module 级程序编写、通用 C# 模块实现，或 Unity C# 编程职责已从项目级 agent 转派出来时，应调用 program.module.agent。
 
-### 第二十步：委派 style-review.agent
+### 第二十步：委派 performance.agent
 
-当请求属于代码风格审查、一致性检查或只读可读性评审时，应调用 style-review.agent。
+performance.agent 不参与 route 分派。
 
-### 第二十一步：委派 performance.agent
+当 main.agent 首次得到 `finalResult`，且任务需要性能分析、性能瓶颈定位或性能优化建议时，应调用 performance.agent。
 
-当请求属于性能瓶颈定位、性能分析或优化建议输出时，应调用 performance.agent。
+### 第二十一步：委派 style-review.agent
+
+style-review.agent 不参与 route 分派。
+
+当 performance.agent 处理完成后，若任务需要代码风格审查、一致性检查或只读可读性评审时，应调用 style-review.agent。
 
 ### 第二十二步：生成最终输出
 
@@ -511,7 +523,7 @@ main.agent 必须先获得：
 - 涉及项目配置时，必须优先读取项目根目录的 `project.config.json`。
 - 创建或维护 `project.config.json` 时，必须基于 `/gists/project.config.json.gist.md`，并逐项向用户核对配置值。
 - 当任务属于 agent 创建或维护时，委派执行面固定为 bootstrap-agent.skill。
-- 当任务属于 Git 或远端仓库操作时，委派执行面固定为 git.agent。
+- 当任务属于 Git 或远端仓库操作时，委派执行面固定为 git.agent；若任务已拆成多个 TODO，则每完成一个 TODO 后都必须补一次 git.agent。
 - 当任务属于 Main 代码、项目创建或项目信息维护时，委派执行面固定为 program.main.agent。
 - 当任务属于 Entity 代码或实体建模时，委派执行面固定为 program.entity.agent。
 - 当任务属于 Editor 代码或编辑器期扩展时，委派执行面固定为 program.editor.agent。
@@ -522,8 +534,8 @@ main.agent 必须先获得：
 - 当任务属于 Unity 策划相关内容时，委派执行面固定为 unity.gamedesign.agent。
 - 当任务属于 Unity 内部美术内容时，委派执行面固定为 unity.art.agent。
 - 当任务属于 module 级程序编写或 C# 模块实现时，委派执行面固定为 program.module.agent。
-- 当任务属于代码风格审查时，委派执行面固定为 style-review.agent。
-- 当任务属于性能分析时，委派执行面固定为 performance.agent。
+- performance.agent 不参与 route，而是在首次得到 `finalResult` 后才允许介入。
+- style-review.agent 不参与 route，而是在 performance.agent 处理完成后才允许介入。
 - 在向用户返回当前轮输出前，必须委派 turnover.agent 追加记录原始输入与原始输出。
 
 ## 成功标准
@@ -540,6 +552,7 @@ main.agent 必须先获得：
 - 能在需要时按 gist 模板逐项核对后创建或维护 `project.config.json`
 - 能在 agent 创建或维护场景下正确调用 bootstrap-agent.skill
 - 能在 Git 或远端仓库场景下正确调用 git.agent
+- 能在 Milestone 的每个 TODO 完成后正确补一次 git.agent
 - 能在 Main 代码、项目创建或项目信息维护场景下正确调用 program.main.agent
 - 能在 Entity 代码或实体建模场景下正确调用 program.entity.agent
 - 能在 Editor 代码或编辑器期扩展场景下正确调用 program.editor.agent
@@ -550,8 +563,8 @@ main.agent 必须先获得：
 - 能在 Unity 策划场景下正确调用 unity.gamedesign.agent
 - 能在 Unity 内部美术场景下正确调用 unity.art.agent
 - 能在 module 编写或 C# 模块场景下正确调用 program.module.agent
-- 能在代码风格审查场景下正确调用 style-review.agent
-- 能在性能分析场景下正确调用 performance.agent
+- 能在首次得到 `finalResult` 后才调用 performance.agent
+- 能在 performance.agent 处理完成后才调用 style-review.agent
 - 能在返回当前轮结果前正确调用 turnover.agent 追加记录原始输入与原始输出
 - 能在需要 shell 时优先使用 `cmd`，并仅在必要时切换到 PowerShell
 - 能阻止未确认 header 的编辑
