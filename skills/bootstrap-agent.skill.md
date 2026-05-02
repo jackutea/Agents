@@ -318,8 +318,9 @@ skill 清单至少应包含：
 
 ## 质量标准
 
-一个合格的 agent skill 至少满足以下条件：
+一个合格的 agent 至少满足以下条件：
 
+- tools 一定包含 vscode
 - 能指导创建 agent
 - 能指导修改 agent
 - 能强制 agent 具备 Input、事项、Output 三块核心内容
