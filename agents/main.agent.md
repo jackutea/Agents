@@ -188,8 +188,9 @@ main(input) {
 - 当任务属于 Editor 代码或编辑器期扩展时，委派执行面固定为 program.editor.agent。
 - 当任务属于核心体验设计时，委派执行面固定为 gamedesign.core-experience.agent。
 - 当任务属于玩法设计、玩法规则收束或核心循环设计时，委派执行面固定为 gamedesign.gameplay.agent。
-- 当任务属于系统设计、系统规则收束、状态流转设计或长期驱动设计时，委派执行面固定为 gamedesign.system.agent。
-- 当任务属于数值策划、成长曲线设计、资源平衡、战斗平衡或奖励结构收束时，委派执行面固定为 gamedesign.balance.agent。
+- 当任务属于系统设计、系统规则收束、状态流转设计、任务结构、分支逻辑或长期驱动设计时，委派执行面固定为 gamedesign.system.agent；不要把数值曲线、资源定价或伤害系数混派到该 agent。
+- 当任务属于数值策划、成长曲线设计、资源平衡、战斗平衡、奖励结构收束或量化参数设计时，委派执行面固定为 gamedesign.balance.agent；不要把系统状态机、任务结构或分支逻辑混派到该 agent。
+- 除 gamedesign.core-experience.agent 外，其他 gamedesign agent 在规则或数值已经收束、且用户明确要求 Unity ScriptableObject 落地并提供真实类型名、路径或 GUID 上下文时，应显式编排 unity-scriptableobject.skill。
 - 当任务属于 Gameplay 代码或玩法逻辑时，委派执行面固定为 program.gameplay.agent。
 - 当任务属于渲染代码或渲染管线集成时，委派执行面固定为 program.render.agent。
 - 当任务属于 System 代码或系统流程逻辑时，委派执行面固定为 program.system.agent。
@@ -225,6 +226,8 @@ main(input) {
 - 能在玩法设计、玩法规则收束或核心循环设计场景下正确调用 gamedesign.gameplay.agent
 - 能在系统设计、系统规则收束、状态流转设计或长期驱动设计场景下正确调用 gamedesign.system.agent
 - 能在数值策划、成长曲线设计、资源平衡、战斗平衡或奖励结构收束场景下正确调用 gamedesign.balance.agent
+- 能阻止 system 与 balance 的职责混派
+- 能在适当时让非 core-experience 的 gamedesign agent 编排 unity-scriptableobject.skill
 - 能在 Gameplay 代码或玩法逻辑场景下正确调用 program.gameplay.agent
 - 能在渲染代码或渲染管线集成场景下正确调用 program.render.agent
 - 能在 System 代码或系统流程逻辑场景下正确调用 program.system.agent
