@@ -2,7 +2,7 @@
 name: turnover
 description: "在 /log/ 目录下按日追加记录人机交互的原始输入与原始输出，不读取既有日志。每条记录需包含精确到秒的时间戳。"
 model: GPT-5 mini (copilot)
-tools: [edit]
+tools: [vscode, edit]
 user-invocable: false
 ---
 

@@ -2,7 +2,7 @@
 name: style-review
 description: "处理代码风格审查与一致性检查，调用 style-review.skill 输出结构化审查结果，不直接修改代码。"
 model: GPT-5 mini (copilot)
-tools: [read, search]
+tools: [vscode,read, search]
 ---
 
 # Style Review Agent
