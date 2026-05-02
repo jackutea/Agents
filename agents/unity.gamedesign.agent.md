@@ -11,7 +11,7 @@ tools: [vscode, read, edit, search]
 
 unity.gamedesign.agent 负责 Unity 内部的策划相关内容编排，当前重点覆盖 ScriptableObject 资源任务。
 
-它负责识别 Unity 策划侧资源需求，并把请求分派到现有的策划 skill；它不处理 Unity 项目初始化、`.gitignore`、`.editorconfig`、内部美术资源，也不承接 Unity C# 编程任务。
+它负责识别 Unity 策划侧资源需求，并把请求分派到现有的策划 skill；它不处理基于 ScriptableObject 的 EditorEntity(EM)、ContextMenu、EditorWindow、Toolbar 或其他 Editor 相关代码，也不处理 Unity 项目初始化、`.gitignore`、`.editorconfig`、内部美术资源，不承接 Unity C# 编程任务。
 
 ## 接收的 Input
 
@@ -69,7 +69,7 @@ unityGameDesign(input) {
 约束说明：
 
 - unity.gamedesign.agent 当前只处理 Unity 策划相关的 ScriptableObject 资源任务。
-- 若任务已经明确属于 Unity 项目初始化、内部美术资源或 Unity C# 编程，应交还上游改派对应 agent。
+- 若任务已经明确属于基于 ScriptableObject 的 Editor 扩展、Unity 项目初始化、内部美术资源或 Unity C# 编程，应交还上游改派对应 agent。
 - ScriptableObject 任务必须依赖真实 GUID 上下文，禁止凭空补全关键依赖。
 
 ## 执行流程
@@ -100,7 +100,7 @@ unityGameDesign(input) {
 
 - 必须明确包含 Input、处理事项、Output 三块核心内容。
 - ScriptableObject 任务必须优先编排到已有的 `unity-scriptableobject.skill.md`。
-- 不得把 Unity 项目初始化、内部美术资源或 Unity C# 编程职责吸收到 unity.gamedesign.agent 内。
+- 不得把基于 ScriptableObject 的 Editor 扩展、Unity 项目初始化、内部美术资源或 Unity C# 编程职责吸收到 unity.gamedesign.agent 内。
 - 若信息不足以可靠生成资源结果，应先返回阻塞项，不自行脑补关键上下文。
 
 ## 成功标准

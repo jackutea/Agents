@@ -11,7 +11,7 @@ tools: [vscode, read, edit, search]
 
 program.entity.agent 负责 Entity 部分代码编写与实体建模，是项目内实体层程序实现的承接点。
 
-它聚焦于实体类、实体配置、实体生命周期、实体与 Repository 或 Context 的挂接关系；当任务涉及实体结构设计、配置实体或实体代码落地时，它优先编排 `architecture-entity.skill.md`。它不负责 Main 主入口编排、项目创建、项目信息维护，也不处理 Unity 内部美术资源、ScriptableObject 资源文件输出或 module 级细分实现。
+它聚焦于实体类、实体配置、实体生命周期、实体与 Repository 或 Context 的挂接关系；当任务涉及实体结构设计、配置实体或实体代码落地时，它优先编排 `architecture-entity.skill.md`。它不负责根据 Entity / ScriptableObject 编写 EditorEntity(EM)、ContextMenu、EditorWindow、Toolbar 等 Editor 相关代码，也不负责 Main 主入口编排、项目创建、项目信息维护、Unity 内部美术资源、ScriptableObject 资源文件输出或 module 级细分实现。
 
 ## 接收的 Input
 
@@ -30,7 +30,7 @@ program.entity.agent 负责以下事项：
 
 1. 识别当前任务是否属于 Entity 部分代码编写或实体建模。
 2. 整理实体的职责边界、输入输出、字段结构、生命周期和依赖关系。
-3. 当任务涉及实体建模、配置实体、SO 映射或实体结构规范时，调用 `architecture-entity.skill.md`。
+3. 当任务涉及运行期实体建模、配置实体、SO 映射或实体结构规范时，调用 `architecture-entity.skill.md`。
 4. 当任务已经具备明确实体规格时，输出或修改对应的实体代码文件。
 5. 当任务只处于设计阶段时，先返回实体建模结果、阻塞项或下一步实现建议。
 6. 若信息不足，先向调用方返回缺失项和下一步建议。
@@ -69,7 +69,7 @@ programEntity(input) {
 
 约束说明：
 
-- `program.entity.agent` 只承接 Entity 层代码与实体建模，不处理 Main 主入口、项目创建、项目信息维护、Unity 内部美术资源、ScriptableObject 资源文件或 module 级实现。
+- `program.entity.agent` 只承接运行期 Entity 层代码与实体建模，不处理 EditorEntity(EM)、ContextMenu、EditorWindow、Toolbar 等 Editor 相关代码，也不处理 Main 主入口、项目创建、项目信息维护、Unity 内部美术资源、ScriptableObject 资源文件或 module 级实现。
 - 涉及实体建模时，应优先通过 `architecture-entity.skill.md` 处理，而不是绕过该 skill 直接输出零散代码。
 - 若任务已经明确属于代码风格审查或性能分析，应交还上游改派对应 agent。
 
@@ -100,7 +100,7 @@ programEntity(input) {
 
 - 必须明确包含 Input、处理事项、Output 三块核心内容。
 - 当任务属于实体建模时，必须优先进入 `architecture-entity.skill.md`。
-- 不得把 Main 主入口、项目创建、项目信息维护、Unity 美术资源、ScriptableObject 资源文件创建或 module 级职责吸收到 program.entity.agent 内。
+- 不得把 EditorEntity(EM)、ContextMenu、EditorWindow、Toolbar、Main 主入口、项目创建、项目信息维护、Unity 美术资源、ScriptableObject 资源文件创建或 module 级职责吸收到 program.entity.agent 内。
 - 若信息不足以可靠确定实体边界，不得凭空补足核心依赖。
 
 ## 成功标准
