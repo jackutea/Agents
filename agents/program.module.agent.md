@@ -33,10 +33,11 @@ program.module.agent 负责以下事项：
 1. 识别当前任务是否属于 module 级程序编写。
 2. 整理模块的职责边界、输入输出、依赖关系和命名方式。
 3. 当任务明确属于 AssetModule 时，调用 `program-assetmodule.skill.md`。
-4. 当任务涉及其他 C# module 编写或修改时，输出或修改对应 `.cs` 文件。
-5. 当任务属于 Unity 语境中的 C# 脚本或模块实现，且尚无对应 module skill 时，调用 `unity-csharp.skill.md` 处理具体脚本结构与架构约束。
-6. 当任务仅是普通 module 结构调整时，直接给出目标模块的文件结果或修改建议。
-7. 若信息不足，先向调用方返回缺失项和下一步建议。
+4. 当任务明确属于 VFXModule 时，调用 `program-vfxmodule.skill.md`。
+5. 当任务涉及其他 C# module 编写或修改时，输出或修改对应 `.cs` 文件。
+6. 当任务属于 Unity 语境中的 C# 脚本或模块实现，且尚无对应 module skill 时，调用 `unity-csharp.skill.md` 处理具体脚本结构与架构约束。
+7. 当任务仅是普通 module 结构调整时，直接给出目标模块的文件结果或修改建议。
+8. 若信息不足，先向调用方返回缺失项和下一步建议。
 
 ## 输出的 Output
 
@@ -64,6 +65,10 @@ programModule(input) {
 
 	if (isAssetModule(moduleSpec)) {
 		return program-assetmodule.skill(moduleSpec)
+	}
+
+	if (isVFXModule(moduleSpec)) {
+		return program-vfxmodule.skill(moduleSpec)
 	}
 
 	if (isCSharpModule(moduleSpec)) {
@@ -95,6 +100,7 @@ programModule(input) {
 ### 第三步：判断是否进入专属 module skill 或 Unity C# skill
 
 - 若目标是 AssetModule：调用 `program-assetmodule.skill.md`
+- 若目标是 VFXModule：调用 `program-vfxmodule.skill.md`
 - 若目标是其他 Unity C# 模块或 Unity `.cs` 脚本：调用 `unity-csharp.skill.md`
 - 若目标不是 Unity C# 脚本：直接在 program.module.agent 内整理并输出模块结果
 
@@ -118,6 +124,7 @@ programModule(input) {
 
 - 能承接 module 级程序编写任务
 - 能在 AssetModule 场景下正确调用 `program-assetmodule.skill.md`
+- 能在 VFXModule 场景下正确调用 `program-vfxmodule.skill.md`
 - 能把 C# 编程职责从上游 agent 接到 program.module.agent
 - 能在 Unity C# 场景下正确调用 `unity-csharp.skill.md`
 - 能把结果以结构化方式返回给调用者
