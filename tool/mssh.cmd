@@ -8,9 +8,9 @@ set "DEFAULT_USER=root"
 set "DEFAULT_KEY=%USERPROFILE%\.ssh\id_ed25519"
 
 REM Usage:
-REM   ssh_120.cmd
-REM   ssh_120.cmd <username>
-REM   ssh_120.cmd <username> <private_key_path>
+REM   mssh.cmd
+REM   mssh.cmd <username>
+REM   mssh.cmd <username> <private_key_path>
 set "USER_NAME=%~1"
 set "KEY_PATH=%~2"
 
@@ -21,7 +21,7 @@ if not exist "%KEY_PATH%" (
     echo [ERROR] SSH private key not found: "%KEY_PATH%"
     echo.
     echo Example:
-    echo   ssh_120.cmd ubuntu "%USERPROFILE%\.ssh\id_ed25519"
+    echo   mssh.cmd ubuntu "%USERPROFILE%\.ssh\id_ed25519"
     exit /b 1
 )
 

@@ -9,7 +9,7 @@ description: "用于 Unity C# 代码编写，适用于创建或修改 MonoBehavi
 
 ## 接收的 Input
 
-- 用户或调用方提出的 Unity C# 代码编写或修改需求
+- Unity C# 代码编写或修改需求
 - 目标脚本路径、类名、命名空间、用途、依赖组件、运行期或编辑器期类型
 - 若涉及架构层设计，还包括上下文注册、实体设计、目录结构、依赖方向、代码风格等架构信息
 
@@ -52,7 +52,7 @@ unityCSharp(input) {
 
 - `unity-csharp.skill` 是 Unity 架构规则进入 architecture skills 的唯一内部入口。
 - 若任务涉及架构设计或风格审查，必须把相关 architecture skills 全部纳入内部编排。
-- `unity.agent` 不直接调用 architecture skills，而是通过 `unity-csharp.skill` 间接处理。
+- 若任务涉及架构设计或风格审查，应在进入本 skill 前一并整理相关架构约束。
 
 ## 实现流程
 1. 确认脚本用途，例如 MonoBehaviour、普通运行期类、Editor 脚本、ScriptableObject 配套脚本、工具类
