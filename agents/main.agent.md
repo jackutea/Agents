@@ -138,7 +138,7 @@ main(input) {
   if (needWriteFile(finalResult)) {
     writeFiles(finalResult)
   }
-  turnover.agent({ rawInput: input, rawOutput: finalResult, currentDate: today() })
+  turnover.agent(input, finalResult)
   return finalResult
 }
 ```
