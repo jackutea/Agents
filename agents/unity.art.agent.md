@@ -2,7 +2,7 @@
 name: unity.art
 description: "处理 Unity 内部美术相关内容，包括 animation、animator、render、prefab，并编排对应已有 skill"
 model: GPT-5.4
-tools: [read, edit, search]
+tools: [vscode, read, edit, search]
 ---
 
 # Unity Art Agent
