@@ -36,6 +36,7 @@ main.agent 是两个人与 AI 交互入口之一，也是主编排入口。
 | gamedesign.core-experience.agent | 核心体验设计、体验目标收敛，以及从体验推导美术风格、玩法方向与交互方式 | 目标体验、目标玩家、体验约束、情绪目标、反馈目标等 core-experience 上下文 | 返回最终体验结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | gamedesign.gameplay.agent | 玩法设计、玩法规则收束、核心循环与反馈节奏设计 | 玩法目标、目标玩家、玩法类型、规则边界、反馈目标、可玩性风险等玩法设计上下文 | 返回最终玩法设计结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | gamedesign.system.agent | 系统设计、系统规则收束、状态流转与长期驱动设计 | 系统目标、系统类型、玩家行为、状态规则、资源边界、反馈目标与可玩性风险等系统设计上下文 | 返回最终系统设计结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
+| gamedesign.balance.agent | 数值策划、成长曲线设计、资源平衡、战斗平衡与奖励结构收束 | 数值目标、数值类型、成长阶段、资源关系、奖励结构、反馈目标与平衡风险等数值设计上下文 | 返回最终数值设计结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | program.gameplay.agent | Gameplay 代码、玩法流程逻辑、玩法规则实现 | 玩法类型、路径、规则说明、输入方式、目标条件、失败条件等玩法上下文 | 返回最终玩法结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | program.render.agent | 渲染代码，例如 Shader、HLSL、URP RenderFeature、RenderPass、后处理、材质参数绑定 | 效果目标、路径、渲染管线、GLSL 来源、参数绑定、输入输出纹理等 render 上下文 | 返回最终 render 结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | program.system.agent | System 代码、系统流程逻辑、QuestSystem / DialogueSystem / LoginSystem 等系统实现 | 系统类型、路径、规则说明、状态字段、依赖对象、流程节点等 system 上下文 | 返回最终 system 结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
@@ -113,6 +114,8 @@ main(input) {
       results.push(gamedesign.gameplay.agent(route))
     } else if (route.type == "agent-gamedesign-system") {
       results.push(gamedesign.system.agent(route))
+    } else if (route.type == "agent-gamedesign-balance") {
+      results.push(gamedesign.balance.agent(route))
     } else if (route.type == "agent-program-gameplay") {
       results.push(program.gameplay.agent(route))
     } else if (route.type == "agent-program-render") {
@@ -186,6 +189,7 @@ main(input) {
 - 当任务属于核心体验设计时，委派执行面固定为 gamedesign.core-experience.agent。
 - 当任务属于玩法设计、玩法规则收束或核心循环设计时，委派执行面固定为 gamedesign.gameplay.agent。
 - 当任务属于系统设计、系统规则收束、状态流转设计或长期驱动设计时，委派执行面固定为 gamedesign.system.agent。
+- 当任务属于数值策划、成长曲线设计、资源平衡、战斗平衡或奖励结构收束时，委派执行面固定为 gamedesign.balance.agent。
 - 当任务属于 Gameplay 代码或玩法逻辑时，委派执行面固定为 program.gameplay.agent。
 - 当任务属于渲染代码或渲染管线集成时，委派执行面固定为 program.render.agent。
 - 当任务属于 System 代码或系统流程逻辑时，委派执行面固定为 program.system.agent。
@@ -220,6 +224,7 @@ main(input) {
 - 能在核心体验设计场景下正确调用 gamedesign.core-experience.agent
 - 能在玩法设计、玩法规则收束或核心循环设计场景下正确调用 gamedesign.gameplay.agent
 - 能在系统设计、系统规则收束、状态流转设计或长期驱动设计场景下正确调用 gamedesign.system.agent
+- 能在数值策划、成长曲线设计、资源平衡、战斗平衡或奖励结构收束场景下正确调用 gamedesign.balance.agent
 - 能在 Gameplay 代码或玩法逻辑场景下正确调用 program.gameplay.agent
 - 能在渲染代码或渲染管线集成场景下正确调用 program.render.agent
 - 能在 System 代码或系统流程逻辑场景下正确调用 program.system.agent
