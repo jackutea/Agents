@@ -1,7 +1,7 @@
 ---
 name: program.render
 description: "处理渲染相关代码，包括 Shader、HLSL、URP RenderFeature、RenderPass、后处理与材质参数绑定。"
-model: GPT-5.4
+model: GPT-5.3-Codex (copilot)
 tools: [vscode, read, edit, search]
 user-invocable: false
 ---

@@ -42,7 +42,6 @@ main.agent 是两个人与 AI 交互入口之一，也是主编排入口。
 | program.system.agent | System 代码、系统流程逻辑、QuestSystem / DialogueSystem / LoginSystem 等系统实现 | 系统类型、路径、规则说明、状态字段、依赖对象、流程节点等 system 上下文 | 返回最终 system 结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | program.ui.agent | UI 代码、UI Panel / UI View / UI Controller 结构整理、UI 交互逻辑实现 | UI 类名称、路径、职责边界、节点引用、交互流程、状态切换规则、生命周期要求等 UI 代码上下文 | 返回最终 UI 代码结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | unity.ui.agent | Unity UI 相关 prefab、Canvas、UI 组件维护 | UI 资源路径、节点层级、组件清单、Canvas 配置、适配规则、GUID 上下文 | 返回最终 UI 资源结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
-| unity.gamedesign.agent | Unity 策划相关内容，例如 ScriptableObject 资源创建、补全、校验与维护 | ScriptableObject 类型名、资源名称、目标路径、命名规则、GUID 上下文等策划上下文 | 返回最终策划资源结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | unity.art.agent | Unity 内部美术内容，例如 animation、animator、非 UI prefab | 目标资源用途、路径、命名规则、关键帧需求、状态机结构、Prefab 层级信息、GUID 上下文 | 返回最终美术资源结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | program.module.agent | module 级程序编写、通用 C# 模块实现、承接 Unity C# 编程分派 | 目标模块名称、路径、职责边界、命名空间、依赖关系、脚本用途等上下文 | 返回最终代码结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | performance.agent | 性能分析、瓶颈定位、优化建议输出 | 目标模块或文件、性能症状、平台环境、预算、Profiler 或日志线索等上下文 | 返回最终分析结果时由 main.agent 汇总；返回阻塞时继续补问 |
@@ -126,8 +125,6 @@ main(input) {
       results.push(program.ui.agent(route))
     } else if (route.type == "agent-unity-ui") {
       results.push(unity.ui.agent(route))
-    } else if (route.type == "agent-unity-gamedesign") {
-      results.push(unity.gamedesign.agent(route))
     } else if (route.type == "agent-unity-art") {
       results.push(unity.art.agent(route))
     } else if (route.type == "agent-program-module") {
@@ -200,7 +197,6 @@ main(input) {
 - 当任务属于 System 代码或系统流程逻辑时，委派执行面固定为 program.system.agent。
 - 当任务属于运行期 UI 代码或 UI 结构逻辑时，委派执行面固定为 program.ui.agent。
 - 当任务属于 UI prefab、Canvas 或 UI 组件维护时，委派执行面固定为 unity.ui.agent。
-- 当任务属于 Unity 策划相关内容时，委派执行面固定为 unity.gamedesign.agent。
 - 当任务属于 Unity 内部美术内容时，委派执行面固定为 unity.art.agent。
 - 当任务属于 module 级程序编写或 C# 模块实现时，委派执行面固定为 program.module.agent。
 - performance.agent 不参与 route，而是在首次得到 `finalResult` 后才允许介入。
@@ -238,7 +234,6 @@ main(input) {
 - 能在 System 代码或系统流程逻辑场景下正确调用 program.system.agent
 - 能在运行期 UI 代码或 UI 结构逻辑场景下正确调用 program.ui.agent
 - 能在 UI prefab、Canvas 或 UI 组件维护场景下正确调用 unity.ui.agent
-- 能在 Unity 策划场景下正确调用 unity.gamedesign.agent
 - 能在 Unity 内部美术场景下正确调用 unity.art.agent
 - 能在 module 编写或 C# 模块场景下正确调用 program.module.agent
 - 能在首次得到 `finalResult` 后才调用 performance.agent

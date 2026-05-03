@@ -1,7 +1,7 @@
 ---
 name: program.gameplay
 description: "处理 Gameplay 部分代码编写与玩法流程逻辑整理。"
-model: GPT-5.4
+model: GPT-5.3-Codex (copilot)
 tools: [vscode, read, edit, search]
 user-invocable: false
 ---

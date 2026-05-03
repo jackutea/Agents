@@ -1,7 +1,7 @@
 ---
 name: program.entity
 description: "处理 Entity 部分代码编写与实体建模，并编排 entity 相关 architecture skill。"
-model: GPT-5.4
+model: GPT-5.3-Codex (copilot)
 tools: [vscode, read, edit, search]
 user-invocable: false
 ---

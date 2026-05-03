@@ -1,7 +1,7 @@
 ---
 name: program.ui
 description: "处理 UI 部分代码编写与 UI 结构逻辑整理。"
-model: GPT-5.4
+model: GPT-5.3-Codex (copilot)
 tools: [vscode, read, edit, search]
 user-invocable: false
 ---
