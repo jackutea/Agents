@@ -72,6 +72,8 @@ main(input) {
   // `main.agent` 先调用的是 `milestone.agent`，不是其他执行 agent。
   // 在正式路由前，需要先从输入中抽取用户目标、约束条件、是否需要文件输出、是否已有中间结果、
   // 是否需要多个 agent 协作，以及是否涉及项目配置或项目级参数。
+  // 若任务涉及用户工程协作或外部 agent 编排，还必须把用户工程根目录下的 `/AI-User/agents` 作为 route 编排输入之一，
+  // 用于补充可参与当前任务的用户侧 agent 上下文；信息不足时先向用户确认工程根目录，不自行假定路径。
   // 同时必须先明确当前任务本身的 Input、事项、Output 三块核心内容；若缺失到无法可靠继续，则先向用户提问补齐。
   if (isProjectConfigTask(input)) {
     // 涉及项目配置时，必须先读取或维护 `project.config.json`；若需要新建或维护它，
@@ -87,12 +89,14 @@ main(input) {
     return blockedOutput
   }
 
-  var gamedesignRoutePlan = decideGameDesignRoutes(milestoneResult)
-  var artUiRoutePlan = decideArtUiRoutes(milestoneResult, gamedesignRoutePlan)
-  var programRoutePlan = decideProgramRoutes(milestoneResult, gamedesignRoutePlan, artUiRoutePlan)
+  var aiUserAgentsContext = maybeReadUserProjectAgents(input)
+  var gamedesignRoutePlan = decideGameDesignRoutes(milestoneResult, aiUserAgentsContext)
+  var artUiRoutePlan = decideArtUiRoutes(milestoneResult, gamedesignRoutePlan, aiUserAgentsContext)
+  var programRoutePlan = decideProgramRoutes(milestoneResult, gamedesignRoutePlan, artUiRoutePlan, aiUserAgentsContext)
   // routePlan 不是一次性直接生成，而是必须先得到 gamedesignRoutePlan，
   // 再得到 artUiRoutePlan，最后再得到 programRoutePlan。
-  var routePlan = mergeRoutePlans(gamedesignRoutePlan, artUiRoutePlan, programRoutePlan)
+  // 若存在用户工程根目录下的 `/AI-User/agents`，合并 route 时必须一并吸收其可用 agent 上下文。
+  var routePlan = mergeRoutePlans(gamedesignRoutePlan, artUiRoutePlan, programRoutePlan, aiUserAgentsContext)
   var results = []
 
   for each route in routePlan {
@@ -173,6 +177,7 @@ main(input) {
 - main.agent 的正文应保持职责、调用的 agent 清单、调用的 skill 清单、任务编排、强制约束、质量标准六块固定结构，不额外保留其他并列章节。
 - main.agent 收到输入后，必须先调用 milestone.agent，再决定后续路由。
 - main.agent 在决定路由时，必须先得到 gamedesignRoutePlan，再得到 artUiRoutePlan，最后才能得到 programRoutePlan。
+- 若任务涉及用户工程协作或外部 agent 编排，main.agent 在 route 编排时必须纳入用户工程根目录下的 `/AI-User/agents` 作为输入来源之一；若工程根目录不明确，必须先向用户确认。
 - 所有通过 main.agent 编排的任务，都必须明确 Input、事项、Output 三块内容。
 - 文档结构必须便于后续继续增加 agent；新增 agent 时优先在“已接入 Agent”中追加条目，而不是改写主流程。
 - 当用户提及 agent 时，默认也视为提及对应 skill，main.agent 必须同步评估 skill 处理范围。
@@ -211,6 +216,7 @@ main(input) {
 - 能接收用户与 AI 的输入
 - 能先通过 milestone.agent 产出 Milestone(M) 与 TODO(T)
 - 能按顺序先得到 gamedesignRoutePlan，再得到 artUiRoutePlan，最后得到 programRoutePlan
+- 能在需要时把用户工程根目录下的 `/AI-User/agents` 纳入 route 编排输入，并在工程根目录不明确时先向用户确认
 - 能把任务合理分派给一个或多个 agent
 - 能识别哪些输出只是中间结果，并继续推进到下一 agent
 - 能在需要时落地到文件
