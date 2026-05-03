@@ -47,13 +47,15 @@ main.agent 是两个人与 AI 交互入口之一，也是主编排入口。
 | program.module.agent | module 级程序编写、通用 C# 模块实现、承接 Unity C# 编程分派 | 目标模块名称、路径、职责边界、命名空间、依赖关系、脚本用途等上下文 | 返回最终代码结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | performance.agent | 性能分析、瓶颈定位、优化建议输出 | 目标模块或文件、性能症状、平台环境、预算、Profiler 或日志线索等上下文 | 返回最终分析结果时由 main.agent 汇总；返回阻塞时继续补问 |
 | style-review.agent | 代码风格审查、一致性检查、可读性规则校验 | 目标文件或代码片段、审查范围、风格约束、忽略规则等上下文 | 返回最终审查结果时由 main.agent 汇总；返回阻塞时继续补问 |
+| bootstrap.agent | 新增或修改 agent / skill，并在每次人机交互中归纳可改进项后向用户问询确认 | 用户目标、当前轮交互内容、候选改进项、已确认的处理范围 | 返回最终 bootstrap 结果时由 main.agent 汇总；返回待确认态时由 main.agent 继续向用户问询 |
 | turnover.agent | 记录一次人机交互中的原始输入与原始输出 | 原始输入、原始输出、当前日期 | 完成记录后由 main.agent 返回当前轮结果；若记录失败，由 main.agent 在最终输出中说明状态 |
 
 ## 调用的 skill 清单
 
 | 名称 | 适用任务 | 接收的输入 | 后续衔接 |
 | --- | --- | --- | --- |
-| bootstrap-agent.skill | 创建 agent、修改 agent、维护 agent、完善 agent | 用户目标、边界条件、header 决策、目标 agent 的 Input / 事项 / Output 要求 | 返回最终 agent 结果时由 main.agent 汇总；返回中间状态时由 main.agent 决定继续调用或提问 |
+| bootstrap-agent.skill | 创建 agent、修改 agent、维护 agent、完善 agent | 用户目标、边界条件、header 决策、目标 agent 的 Input / 事项 / Output 要求 | 返回最终 agent 结果时由 bootstrap.agent 或 main.agent 汇总；返回中间状态时由上层编排决定继续调用或提问 |
+| bootstrap-skill.skill | 创建 skill、修改 skill、维护 skill、完善 skill | 用户目标、边界条件、目标 skill 的 Input / Output / 编排要求、已确认的改进范围 | 返回最终 skill 结果时由 bootstrap.agent 或 main.agent 汇总；返回中间状态时由上层编排决定继续调用或提问 |
 
 ## 任务编排
 
@@ -96,10 +98,8 @@ main(input) {
 
   for each route in routePlan {
     if (route.type == "agent-bootstrap") {
-      // `bootstrap-agent.skill` 是 skill，不是 agent；在创建或维护 agent 场景下由 `main.agent` 直接调用。
-      ensureAgentHeaderConfirmed(route)
-      ensureSkillSelectionConfirmed(route)
-      results.push(bootstrap-agent.skill(route))
+      // `bootstrap.agent` 统一处理 agent / skill 的创建、维护与改进项问询，再按需要调用对应 skill。
+      results.push(bootstrap.agent(route))
     } else if (route.type == "agent-git") {
       results.push(git.agent(route))
     } else if (route.type == "agent-program-main") {
@@ -150,6 +150,10 @@ main(input) {
     // `style-review.agent` 不参与 route，而是在 `performance.agent` 处理完成后再按固定顺序介入。
     finalResult = style-review.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
   }
+  if (needsBootstrapReview(input, finalResult, milestoneResult)) {
+    // `bootstrap.agent` 不参与 route，而是在 `style-review.agent` 处理完成后、`turnover.agent` 之前按固定顺序介入。
+    finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
+  }
   if (needWriteFile(finalResult)) {
     // 在生成最终输出时，需要先判断是否应写入文件；若需要，则先落地文件。
     writeFiles(finalResult)
@@ -181,7 +185,7 @@ main(input) {
 - shell 默认优先使用 `cmd`；只有 `cmd` 不具备能力时才使用 PowerShell。
 - 涉及项目配置时，必须优先读取项目根目录的 `project.config.json`。
 - 创建或维护 `project.config.json` 时，必须基于 `/gists/project.config.json.gist.md`，并逐项向用户核对配置值。
-- 当任务属于 agent 创建或维护时，委派执行面固定为 bootstrap-agent.skill。
+- 当任务属于 agent / skill 创建、维护，或需要在当前轮交互后整理 agent / skill 改进项时，委派执行面固定为 bootstrap.agent。
 - 当任务属于 Git 或远端仓库操作时，委派执行面固定为 git.agent；若任务已拆成多个 TODO，则每完成一个 TODO 后都必须补一次 git.agent。
 - 当任务属于 Main 代码、项目创建或项目信息维护时，委派执行面固定为 program.main.agent。
 - 当任务属于 Entity 代码或实体建模时，委派执行面固定为 program.entity.agent。
@@ -201,6 +205,7 @@ main(input) {
 - 当任务属于 module 级程序编写或 C# 模块实现时，委派执行面固定为 program.module.agent。
 - performance.agent 不参与 route，而是在首次得到 `finalResult` 后才允许介入。
 - style-review.agent 不参与 route，而是在 performance.agent 处理完成后才允许介入。
+- bootstrap.agent 不参与 route，而是在 style-review.agent 之后、turnover.agent 之前才允许介入。
 - 在向用户返回当前轮输出前，必须委派 turnover.agent 追加记录原始输入与原始输出。
 
 ## 质量标准
@@ -216,7 +221,7 @@ main(input) {
 - 能对多 agent 结果做统一汇总
 - 能在涉及项目配置时优先读取 `project.config.json`
 - 能在需要时按 gist 模板逐项核对后创建或维护 `project.config.json`
-- 能在 agent 创建或维护场景下正确调用 bootstrap-agent.skill
+- 能在 agent / skill 创建、维护或改进收束场景下正确调用 bootstrap.agent
 - 能在 Git 或远端仓库场景下正确调用 git.agent
 - 能在 Milestone 的每个 TODO 完成后正确补一次 git.agent
 - 能在 Main 代码、项目创建或项目信息维护场景下正确调用 program.main.agent
