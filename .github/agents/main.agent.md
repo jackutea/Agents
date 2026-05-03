@@ -16,7 +16,7 @@ user-invocable: true
 
 ## 约束
 - 每次人机交互时，都必须先切到 Plan 模式。
-- 下文的`任务编排`是该 agent 的核心，必须严格遵守其中描述的调用关系。
+- 严格参考`##任务编排`执行
 
 ## 调用的 agent 清单
 
@@ -145,7 +145,7 @@ main(input) {
     finalResult = style-review.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
   }
 
-  // `bootstrap.agent` 不参与 route，而是在 `style-review.agent` 处理完成后、`turnover.agent` 之前按固定顺序介入。
+  // `bootstrap.agent` 必须在每次人机交互后归纳本轮交互中是否有 agent / skill 需要新增或改进，并向用户问询确认
   if (askToNeedsBootstrap(input, finalResult)) {
     finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
   }
