@@ -1,7 +1,7 @@
 ---
 name: gamedesign.system.agent
 description: "负责系统设计，包括任务、对话、成长、资源、状态流转与系统规则收束"
-model: gpt-5.4
+model: Gemini 3.1 Pro (Preview) (copilot)
 tools: [vscode, read, edit]
 user-invocable: false
 ---

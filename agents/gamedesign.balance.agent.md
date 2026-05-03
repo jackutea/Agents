@@ -1,7 +1,7 @@
 ---
 name: gamedesign.balance.agent
 description: "负责数值策划，包括成长曲线、战斗平衡、资源产出消耗、奖励结构与数值规则收束"
-model: gpt-5.4
+model: Gemini 3.1 Pro (Preview) (copilot)
 tools: [vscode, read, edit]
 user-invocable: false
 ---

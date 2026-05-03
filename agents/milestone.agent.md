@@ -1,7 +1,7 @@
 ---
 name: milestone
 description: "收到输入后分析需求，拆解出 Milestone(M) 与 TODO(T)，并在用户工程目录的 /AI-User/docs/Milestone.md 中持续追踪、读写结构化结果。"
-model: GPT-5.4
+model: Gemini 3.1 Pro (Preview) (copilot)
 tools: [vscode, read, todo, edit]
 user-invocable: false
 ---

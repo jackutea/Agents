@@ -1,7 +1,7 @@
 ---
 name: gamedesign.gameplay.agent
 description: "负责玩法设计，包括玩法规则、循环、目标、反馈与可玩性收束"
-model: gpt-5.4
+model: Gemini 3.1 Pro (Preview) (copilot)
 tools: [vscode, read, edit]
 user-invocable: false
 ---

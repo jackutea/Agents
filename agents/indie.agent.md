@@ -1,7 +1,7 @@
 ---
 name: indie
 description: "独立工作的人机交互入口，适用于迷你型任务；不与其他 agent 协作，但允许调用所有 skills。"
-model: GPT-5.4
+model: Gemini 3.1 Pro (Preview) (copilot)
 tools: [vscode, execute, read, edit, search, web, browser, todo]
 user-invocable: true
 ---

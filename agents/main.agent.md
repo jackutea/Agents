@@ -1,7 +1,7 @@
 ---
 name: main
 description: "人机交互主入口之一；适用于复杂或多阶段任务，接收用户与 AI 的输入，分析任务并分派给一个或多个合适的 agent，按阶段串联中间结果，最终在必要时输出到文件，并向用户返回总结。"
-model: GPT-5.4
+model: Gemini 3.1 Pro (Preview) (copilot)
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 user-invocable: true
 ---

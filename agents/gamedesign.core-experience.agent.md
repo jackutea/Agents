@@ -1,7 +1,7 @@
 ---
 name: gamedesign.core-experience
 description: "处理核心体验设计，不直接定义玩法，而是先定义某种体验，例如飞翔感、聪明感、杀戮快感，并由体验推导美术风格、玩法、交互方式，再交由特定 gameplay skill 落地。"
-model: GPT-5.4
+model: Gemini 3.1 Pro (Preview) (copilot)
 tools: [vscode, read, edit, search]
 user-invocable: false
 ---
