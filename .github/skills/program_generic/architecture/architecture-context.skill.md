@@ -33,6 +33,10 @@ architecture-context.skill 的 Output 应包含：
 - 哪些对象禁止持有或接收 `GameContext`
 - 若存在违规，明确指出违规点与修正建议
 
+## 强制约束
+
+- 所有的目录结构规划与设计必须严格参考 `/gists/project-dirs.gist.md`。
+
 ## 任务编排
 
 architecture-context.skill 的任务编排是先识别对象分组，再校验命名和边界，最后给出上下文注册结果。

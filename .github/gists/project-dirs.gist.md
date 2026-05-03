@@ -1,0 +1,32 @@
+```
+// Client
+Src_Runtime/
+    System/
+    Controller/
+    Entity/
+        Entity_{A}/
+            Component/
+            Entity_A.cs
+    Panel/
+    Module/
+    Helper/
+    Extension/
+    Typedef/
+    Enum/
+    Const/
+    ClientMain.cs
+    GameContext.cs
+Src_Editor/
+    EditorEntity/
+    ContextMenu/
+    EditorWindow/
+    Toolbar/
+Src_Tests/
+Res_Runtime/
+    Entity_{A}/
+    Entity_{B}/
+    RenderPipeline/
+    Shader/
+    Panel/
+    Scene_Game.unity
+```

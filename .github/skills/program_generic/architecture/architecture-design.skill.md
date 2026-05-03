@@ -82,6 +82,7 @@ architectureDesign(input) {
 
 ## 约束
 
+- 设计的所有的目录结构必须严格参考 `/gists/project-dirs.gist.md`。
 - 设计必须严格遵循本 skill 的 Gist 规范。
 - 使用中文交流。
 - 控制流必须保持顺序分层，由上层调用下层；仅 Controller 属于特例，允许 Controller 之间互相调用。
