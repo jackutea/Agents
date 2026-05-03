@@ -13,16 +13,18 @@ user-invocable: true
 
 ## 输出结果
 - 面向用户时，需要说明任务进度。
+- 对于里程碑管理：在用户工程目录的 `/AI-User/docs/Milestone.md` 中持续追踪、读写结构化结果。
 
 ## 约束
 - 每次人机交互时，都必须先切到 Plan 模式。
+- 必须优先分析输入并拆解出 Milestone(M) 与 TODO(T)。如果不符合生成里程碑的条件（例如只是简单对话或信息不足），则先向用户询问补充。
+- 必须在用户工程目录下优先读取 `/AI-User/docs/Milestone.md`；若不存在则以 `/gists/Milestone.gist.md` 为模板创建，并在每次拆解后增量更新，保持与模板一致的复选框格式（`[ ]` 和 `[√]`）。
 - 严格参考`##任务编排`执行
 
 ## 调用的 agent 清单
 
 | 名称 | 适用任务 | 接收的输入 | 后续衔接 |
 | --- | --- | --- | --- |
-| milestone.agent | 需求分析、阶段拆解、TODO 拆分，以及在用户工程目录的 /AI-User/docs/Milestone.md 中持续追踪 Milestone | 用户需求、上下文、约束、已有中间结果、交付要求、用户工程根目录 | main.agent 必须先读取其输出与 Milestone.md 同步结果，再决定后续调用哪个或哪些 agent |
 | git.agent | 远端仓库管理，以及 fetch、pull、add、commit、push、merge 等 Git 操作 | 仓库路径、分支、远端平台、目标操作、提交信息、冲突状态等上下文 | 返回最终 Git 结果时由 main.agent 汇总；返回冲突或阻塞时继续确认或分派 |
 | program.main.agent | Main 代码、项目创建、项目信息维护 | 入口类名称、路径、生命周期要求、依赖清单、项目根目录、Unity 版本、目标平台、项目级参数 | 返回最终项目级结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | program.entity.agent | Entity 代码、实体建模、实体结构整理 | 实体名称、路径、字段结构、生命周期、依赖对象、配置来源等实体上下文 | 返回最终实体结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
@@ -59,7 +61,6 @@ main(input) {
   // 编排原则是：能明确分派时就分派；中间结果不可直接交付时继续串联；
   // 多 agent 是否串行或并行由依赖关系决定；routePlan 必须按先 gamedesign、后 art/ui、最后 program 的顺序推导；
   // 最终输出前必须完成统一汇总。
-  // `main.agent` 先调用的是 `milestone.agent`，不是其他执行 agent。
   // 在正式路由前，需要先从输入中抽取用户目标、约束条件、是否需要文件输出、是否已有中间结果、
   // 是否需要多个 agent 协作，以及是否涉及项目配置或项目级参数。
   // 若任务涉及用户工程协作或外部 agent 编排，还必须把用户工程根目录下的 `/AI-User/agents` 作为 route 编排输入之一，
@@ -71,14 +72,26 @@ main(input) {
     var projectConfig = readOrMaintainProjectConfig(input)
   }
 
-  // `milestone.agent` 必须优先读取用户工程目录下的 `/AI-User/docs/Milestone.md`；若不存在则创建，并在本轮拆解后写回。
-  var milestoneResult = milestone.agent(input)
-  if (milestoneResult.isBlocked) {
-    // 若 `milestone.agent` 判断信息不足，则 `main.agent` 需要先向用户补问，再继续后续编排。
-    var blockedOutput = askUserForMissingInfo(milestoneResult)
+  // `main.agent` 直接负责 Milestone 管理：读取或创建用户工程目录下的 `/AI-User/docs/Milestone.md`。
+  if (isMissingUserProjectRoot(input)) {
+    var blockedOutput = buildBlockedResultForProjectRoot(input)
     turnover.agent({ rawInput: input, rawOutput: blockedOutput, currentDate: today(), currentTime: now(), userProjectRoot: input.userProjectRoot })
     return blockedOutput
   }
+
+  var milestoneDoc = readOrCreateMilestoneDocWithTemplate(input, "/AI-User/docs/Milestone.md", "/gists/Milestone.gist.md")
+  var normalizedInput = analyzeInput(input, milestoneDoc)
+  if (isMissingCriticalInfo(normalizedInput)) {
+    var blockedOutput = askUserForMissingInfo(normalizedInput)
+    turnover.agent({ rawInput: input, rawOutput: blockedOutput, currentDate: today(), currentTime: now(), userProjectRoot: input.userProjectRoot })
+    return blockedOutput
+  }
+
+  var milestones = buildMilestones(normalizedInput)
+  var todos = buildTodos(milestones)
+  annotateDependencies(milestones, todos)
+  updateMilestoneDoc(milestoneDoc, milestones, todos)
+  var milestoneResult = { milestones, todos, milestoneDoc }
 
   var aiUserAgentsContext = maybeReadUserProjectAgents(input)
   var gamedesignRoutePlan = decideGameDesignRoutes(milestoneResult, aiUserAgentsContext)
