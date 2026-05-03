@@ -28,7 +28,7 @@ main.agent 是两个人与 AI 交互入口之一，也是主编排入口。
 
 | 名称 | 适用任务 | 接收的输入 | 后续衔接 |
 | --- | --- | --- | --- |
-| milestone.agent | 需求分析、阶段拆解、TODO 拆分 | 用户原始需求、上下文、约束、已有中间结果、交付要求 | main.agent 必须先读取其输出，再决定后续调用哪个或哪些 agent |
+| milestone.agent | 需求分析、阶段拆解、TODO 拆分，以及在用户工程目录的 /AI-User/docs/Milestone.md 中持续追踪 Milestone | 用户原始需求、上下文、约束、已有中间结果、交付要求、用户工程根目录 | main.agent 必须先读取其输出与 Milestone.md 同步结果，再决定后续调用哪个或哪些 agent |
 | git.agent | 远端仓库管理，以及 fetch、pull、add、commit、push、merge 等 Git 操作 | 仓库路径、分支、远端平台、目标操作、提交信息、冲突状态等上下文 | 返回最终 Git 结果时由 main.agent 汇总；返回冲突或阻塞时继续确认或分派 |
 | program.main.agent | Main 代码、项目创建、项目信息维护 | 入口类名称、路径、生命周期要求、依赖清单、项目根目录、Unity 版本、目标平台、项目级参数 | 返回最终项目级结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | program.entity.agent | Entity 代码、实体建模、实体结构整理 | 实体名称、路径、字段结构、生命周期、依赖对象、配置来源等实体上下文 | 返回最终实体结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
@@ -81,6 +81,7 @@ main(input) {
     var projectConfig = readOrMaintainProjectConfig(input)
   }
 
+  // `milestone.agent` 必须优先读取用户工程目录下的 `/AI-User/docs/Milestone.md`；若不存在则创建，并在本轮拆解后写回。
   var milestoneResult = milestone.agent(input)
   if (milestoneResult.isBlocked) {
     // 若 `milestone.agent` 判断信息不足，则 `main.agent` 需要先向用户补问，再继续后续编排。
@@ -176,6 +177,8 @@ main(input) {
 - main.agent 的核心价值是获得输入、分派任务、汇总最终输出。
 - main.agent 的正文应保持职责、调用的 agent 清单、调用的 skill 清单、任务编排、强制约束、质量标准六块固定结构，不额外保留其他并列章节。
 - main.agent 收到输入后，必须先调用 milestone.agent，再决定后续路由。
+- milestone.agent 在被 main.agent 调用时，必须优先读取用户工程目录下的 /AI-User/docs/Milestone.md；若不存在则创建，并在完成拆解后增量更新。
+- 若用户工程根目录不明确，main.agent 必须先补齐该信息，不能跳过 Milestone.md 的读写追踪。
 - main.agent 在决定路由时，必须先得到 gamedesignRoutePlan，再得到 artUiRoutePlan，最后才能得到 programRoutePlan。
 - 若任务涉及用户工程协作或外部 agent 编排，main.agent 在 route 编排时必须纳入用户工程根目录下的 `/AI-User/agents` 作为输入来源之一；若工程根目录不明确，必须先向用户确认。
 - 所有通过 main.agent 编排的任务，都必须明确 Input、事项、Output 三块内容。
@@ -216,6 +219,7 @@ main(input) {
 
 - 能接收用户与 AI 的输入
 - 能先通过 milestone.agent 产出 Milestone(M) 与 TODO(T)
+- 能让 milestone.agent 在用户工程目录下创建 /AI-User/docs/Milestone.md，并在后续轮次持续读取与增量更新
 - 能按顺序先得到 gamedesignRoutePlan，再得到 artUiRoutePlan，最后得到 programRoutePlan
 - 能在需要时把用户工程根目录下的 `/AI-User/agents` 纳入 route 编排输入，并在工程根目录不明确时先向用户确认
 - 能把任务合理分派给一个或多个 agent
