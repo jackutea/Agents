@@ -8,6 +8,9 @@ user-invocable: true
 
 # Main Agent
 
+## 职责
+- 参考 `description` 中的内容。
+
 ## 接收输入
 - 只接收用户输入。
 
@@ -154,16 +157,12 @@ main(input) {
 
   // `style-review.agent` 不参与 route，而是在 `performance.agent` 处理完成后再按固定顺序介入。
   // 当用户明确允许时，`style-review.agent` 与对应 skill 可以直接落地风格修正。
-  if (askToNeedsStyleReview(input, finalResult)) {
-    finalResult = style-review.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
-  }
+  finalResult = style-review.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
 
   // `bootstrap.agent` 必须在每次人机交互后归纳本轮交互中是否有 agent / skill 需要新增或改进，并向用户问询确认
-  if (askToNeedsBootstrap(input, finalResult)) {
-    finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
-  }
+  finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
 
-  // `turnover.agent` 只负责原样追加记录输入与输出到用户工程目录 `/AI-User/log/`，且不能读取日志文件。
+  // `turnover.agent` 负责追加记录输入与输出到用户工程目录 `/AI-User/log/`，且不能读取日志文件。
   // Output 必须同时可面向用户与面向调用它的 AI：
   // 面向用户时，需要说明任务进度、是否已调用子 agent、是否需要补充信息、是否已产生文件结果，以及最终总结；
   // 面向 AI 时，需要明确当前状态、已调用哪些 agent、各 agent 输出摘要、哪些输出仍是中间结果、
