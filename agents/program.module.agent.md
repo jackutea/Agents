@@ -3,6 +3,7 @@ name: program.module
 description: "处理module的编写（例如：AssetModule、VFXModule、AudioModule、InputModule、NetworkClientModule、L10NModule、AdsModule等），供main或其他agent转派"
 model: GPT-5.4
 tools: [vscode, read, edit, search]
+user-invocable: false
 ---
 
 # Program Module Agent

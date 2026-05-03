@@ -3,6 +3,7 @@ name: program.main
 description: "处理 Main 部分代码编写、项目创建与项目信息维护，并编排 architecture 相关 skill。"
 model: GPT-5.4
 tools: [vscode, read, edit, search]
+user-invocable: false
 ---
 
 # Program Main Agent

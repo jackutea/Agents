@@ -2,8 +2,8 @@
 name: gamedesign.system.agent
 description: "负责系统设计，包括任务、对话、成长、资源、状态流转与系统规则收束"
 model: gpt-5.4
-tools:
-  - vscode
+tools: [vscode, read, edit]
+user-invocable: false
 ---
 
 # Gamedesign System Agent

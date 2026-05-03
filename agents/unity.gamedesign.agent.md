@@ -3,6 +3,7 @@ name: unity.gamedesign
 description: "处理 Unity 策划相关内容，重点覆盖 ScriptableObject 资源编排，并转交现有策划 skill 处理具体资源输出"
 model: GPT-5.4
 tools: [vscode, read, edit, search]
+user-invocable: false
 ---
 
 # Unity GameDesign Agent

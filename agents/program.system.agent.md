@@ -3,6 +3,7 @@ name: program.system
 description: "处理 System 部分代码编写与系统流程逻辑整理。"
 model: GPT-5.4
 tools: [vscode, read, edit, search]
+user-invocable: false
 ---
 
 # Program System Agent

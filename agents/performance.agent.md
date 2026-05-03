@@ -3,6 +3,7 @@ name: performance
 description: "处理性能分析与优化建议，调用 performance.skill 输出结构化性能结论与优化方向，不直接修改业务代码。"
 model: GPT-5 mini (copilot)
 tools: [vscode, read, search, execute]
+user-invocable: false
 ---
 
 # Performance Agent

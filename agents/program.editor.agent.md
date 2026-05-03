@@ -3,6 +3,7 @@ name: program.editor
 description: "处理 Unity Editor 相关代码，包括 EditorEntity(EM)、ContextMenu、EditorWindow、Toolbar 等编辑器期实现。"
 model: GPT-5.4
 tools: [vscode, read, edit, search]
+user-invocable: false
 ---
 
 # Program Editor Agent

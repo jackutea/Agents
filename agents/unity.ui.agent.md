@@ -3,6 +3,7 @@ name: unity.ui
 description: "处理 UI 相关的 .prefab 与 .prefab.meta 创建和维护，并编排 Unity UI 相关 skill。"
 model: GPT-5.4
 tools: [vscode, read, edit, search]
+user-invocable: false
 ---
 
 # Unity UI Agent

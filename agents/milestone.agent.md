@@ -3,6 +3,7 @@ name: milestone
 description: "收到输入后分析需求，拆解出 Milestone(M) 与 TODO(T)，并把结构化结果返回给调用者。"
 model: GPT-5.4
 tools: [vscode, read, todo]
+user-invocable: false
 ---
 
 # Milestone Agent
