@@ -151,10 +151,10 @@ main(input) {
     // `style-review.agent` 不参与 route，而是在 `performance.agent` 处理完成后再按固定顺序介入。
     finalResult = style-review.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
   }
-  if (needsBootstrapReview(input, finalResult, milestoneResult)) {
-    // `bootstrap.agent` 不参与 route，而是在 `style-review.agent` 处理完成后、`turnover.agent` 之前按固定顺序介入。
-    finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
-  }
+
+  // `bootstrap.agent` 不参与 route，而是在 `style-review.agent` 处理完成后、`turnover.agent` 之前按固定顺序介入。
+  finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
+
   if (needWriteFile(finalResult)) {
     // 在生成最终输出时，需要先判断是否应写入文件；若需要，则先落地文件。
     writeFiles(finalResult)
