@@ -70,8 +70,8 @@ bootstrap(input) {
   // 先问询用户是否要进入此流程，如果不进入则直接返回。
   bool wantsBootstrap = askUserIfWantsBootstrap(input)
   if (!wantsBootstrap) {
-    // Output: 返回改派建议，明确用户拒绝进入 bootstrap 流程的
-    return donothingResult("用户拒绝进入 bootstrap 流程，建议直接改派到其他 agent 处理");
+    // Output: 略过流程
+    return donothingResult("用户略过 bootstrap 流程");
   }
 
   // Input 必须符合上面的固定 Input 模板，覆盖用户目标、交互摘要、候选改进项、

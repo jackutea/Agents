@@ -35,6 +35,12 @@ user-invocable: false
 
 ```text
 turnover(input) {
+  // 前置问询用户是否要执行此流程，如果用户拒绝则直接返回改派建议。
+  bool wantsTurnover = askUserIfWantsTurnover(input)
+  if (!wantsTurnover) {
+    // Output: 略过流程
+    return donothingResult("用户略过 turnover 流程");
+  }
   // Input: 输入、输出项列表、当前日期、当前时间、用户工程根目录、固定日志目录 /AI-User/log/。
   if (isMissingRawInput(input) || isMissingRawOutputs(input) || isMissingDate(input) || isMissingTime(input) || isMissingUserProjectRoot(input)) {
     // Output: 返回阻塞原因，明确缺失的最小输入项。
