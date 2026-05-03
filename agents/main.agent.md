@@ -45,7 +45,7 @@ main.agent 是两个人与 AI 交互入口之一，也是主编排入口。
 | unity.art.agent | Unity 内部美术内容，例如 animation、animator、非 UI prefab | 目标资源用途、路径、命名规则、关键帧需求、状态机结构、Prefab 层级信息、GUID 上下文 | 返回最终美术资源结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | program.module.agent | module 级程序编写、通用 C# 模块实现、承接 Unity C# 编程分派 | 目标模块名称、路径、职责边界、命名空间、依赖关系、脚本用途等上下文 | 返回最终代码结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | performance.agent | 性能分析、瓶颈定位、优化建议输出 | 目标模块或文件、性能症状、平台环境、预算、Profiler 或日志线索等上下文 | 返回最终分析结果时由 main.agent 汇总；返回阻塞时继续补问 |
-| style-review.agent | 代码风格审查、一致性检查、可读性规则校验 | 目标文件或代码片段、审查范围、风格约束、忽略规则等上下文 | 返回最终审查结果时由 main.agent 汇总；返回阻塞时继续补问 |
+| style-review.agent | 代码风格审查、一致性检查、可读性规则校验，以及在明确允许时直接修正风格问题 | 目标文件或代码片段、审查范围、风格约束、忽略规则、是否允许落地修改等上下文 | 返回最终审查结果或修正结果时由 main.agent 汇总；返回阻塞时继续补问 |
 | bootstrap.agent | 新增或修改 agent / skill，并在每次人机交互中归纳可改进项后向用户问询确认 | 用户目标、当前轮交互内容、候选改进项、已确认的处理范围 | 返回最终 bootstrap 结果时由 main.agent 汇总；返回待确认态时由 main.agent 继续向用户问询 |
 | turnover.agent | 记录一次人机交互中的原始输入与原始输出 | 原始输入、原始输出、当前日期 | 完成记录后由 main.agent 返回当前轮结果；若记录失败，由 main.agent 在最终输出中说明状态 |
 
@@ -147,10 +147,9 @@ main(input) {
     // `performance.agent` 不参与 route，而是在首次得到 `finalResult` 后按固定顺序介入。
     finalResult = performance.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
   }
-  if (needsStyleReview(input, finalResult)) {
     // `style-review.agent` 不参与 route，而是在 `performance.agent` 处理完成后再按固定顺序介入。
+    // 当用户明确允许时，`style-review.agent` 与对应 skill 可以直接落地风格修正。
     finalResult = style-review.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
-  }
 
   // `bootstrap.agent` 不参与 route，而是在 `style-review.agent` 处理完成后、`turnover.agent` 之前按固定顺序介入。
   finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
@@ -206,6 +205,7 @@ main(input) {
 - 当任务属于 module 级程序编写或 C# 模块实现时，委派执行面固定为 program.module.agent。
 - performance.agent 不参与 route，而是在首次得到 `finalResult` 后才允许介入。
 - style-review.agent 不参与 route，而是在 performance.agent 处理完成后才允许介入。
+- 当任务需要代码风格审查且用户明确允许落地修改时，style-review.agent 与对应 skill 可以直接修改代码文件，但修改范围只限风格与可读性问题。
 - bootstrap.agent 不参与 route，而是在 style-review.agent 之后、turnover.agent 之前才允许介入。
 - 在向用户返回当前轮输出前，必须委派 turnover.agent 追加记录原始输入与原始输出。
 
@@ -244,6 +244,7 @@ main(input) {
 - 能在 module 编写或 C# 模块场景下正确调用 program.module.agent
 - 能在首次得到 `finalResult` 后才调用 performance.agent
 - 能在 performance.agent 处理完成后才调用 style-review.agent
+- 能在用户明确允许时让 style-review.agent 与对应 skill 直接落地风格修正，并限制其修改范围只覆盖风格与可读性问题
 - 能在返回当前轮结果前正确调用 turnover.agent 追加记录原始输入与原始输出
 - 能在需要 shell 时优先使用 `cmd`，并仅在必要时切换到 PowerShell
 - 能阻止未确认 header 的编辑
