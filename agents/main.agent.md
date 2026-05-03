@@ -143,21 +143,22 @@ main(input) {
   }
 
   var finalResult = summarizeResults(results)
-  if (needsPerformanceReview(input, finalResult)) {
+  if (askToNeedsPerformanceReview(input, finalResult)) {
     // `performance.agent` 不参与 route，而是在首次得到 `finalResult` 后按固定顺序介入。
     finalResult = performance.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
   }
-    // `style-review.agent` 不参与 route，而是在 `performance.agent` 处理完成后再按固定顺序介入。
-    // 当用户明确允许时，`style-review.agent` 与对应 skill 可以直接落地风格修正。
+
+  // `style-review.agent` 不参与 route，而是在 `performance.agent` 处理完成后再按固定顺序介入。
+  // 当用户明确允许时，`style-review.agent` 与对应 skill 可以直接落地风格修正。
+  if (askToNeedsStyleReview(input, finalResult)) {
     finalResult = style-review.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
+  }
 
   // `bootstrap.agent` 不参与 route，而是在 `style-review.agent` 处理完成后、`turnover.agent` 之前按固定顺序介入。
-  finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
-
-  if (needWriteFile(finalResult)) {
-    // 在生成最终输出时，需要先判断是否应写入文件；若需要，则先落地文件。
-    writeFiles(finalResult)
+  if (askToNeedsBootstrap(input, finalResult)) {
+    finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
   }
+
   // `turnover.agent` 只负责原样追加记录原始输入与原始输出，且不能读取日志文件。
   // Output 必须同时可面向用户与面向调用它的 AI：
   // 面向用户时，需要说明任务进度、是否已调用子 agent、是否需要补充信息、是否已产生文件结果，以及最终总结；
@@ -205,7 +206,7 @@ main(input) {
 - 当任务属于 module 级程序编写或 C# 模块实现时，委派执行面固定为 program.module.agent。
 - performance.agent 不参与 route，而是在首次得到 `finalResult` 后才允许介入。
 - style-review.agent 不参与 route，而是在 performance.agent 处理完成后才允许介入。
-- 当任务需要代码风格审查且用户明确允许落地修改时，style-review.agent 与对应 skill 可以直接修改代码文件，但修改范围只限风格与可读性问题。
+- style-review.agent 与对应 skill 可以直接修改代码文件，但修改范围只限风格与可读性问题。
 - bootstrap.agent 不参与 route，而是在 style-review.agent 之后、turnover.agent 之前才允许介入。
 - 在向用户返回当前轮输出前，必须委派 turnover.agent 追加记录原始输入与原始输出。
 
@@ -244,7 +245,7 @@ main(input) {
 - 能在 module 编写或 C# 模块场景下正确调用 program.module.agent
 - 能在首次得到 `finalResult` 后才调用 performance.agent
 - 能在 performance.agent 处理完成后才调用 style-review.agent
-- 能在用户明确允许时让 style-review.agent 与对应 skill 直接落地风格修正，并限制其修改范围只覆盖风格与可读性问题
+- 能让 style-review.agent 与对应 skill 直接落地风格修正，并限制其修改范围只覆盖风格与可读性问题
 - 能在返回当前轮结果前正确调用 turnover.agent 追加记录原始输入与原始输出
 - 能在需要 shell 时优先使用 `cmd`，并仅在必要时切换到 PowerShell
 - 能阻止未确认 header 的编辑
