@@ -28,7 +28,7 @@ main.agent 是两个人与 AI 交互入口之一，也是主编排入口。
 
 | 名称 | 适用任务 | 接收的输入 | 后续衔接 |
 | --- | --- | --- | --- |
-| milestone.agent | 需求分析、阶段拆解、TODO 拆分，以及在用户工程目录的 /AI-User/docs/Milestone.md 中持续追踪 Milestone | 用户原始需求、上下文、约束、已有中间结果、交付要求、用户工程根目录 | main.agent 必须先读取其输出与 Milestone.md 同步结果，再决定后续调用哪个或哪些 agent |
+| milestone.agent | 需求分析、阶段拆解、TODO 拆分，以及在用户工程目录的 /AI-User/docs/Milestone.md 中持续追踪 Milestone | 用户需求、上下文、约束、已有中间结果、交付要求、用户工程根目录 | main.agent 必须先读取其输出与 Milestone.md 同步结果，再决定后续调用哪个或哪些 agent |
 | git.agent | 远端仓库管理，以及 fetch、pull、add、commit、push、merge 等 Git 操作 | 仓库路径、分支、远端平台、目标操作、提交信息、冲突状态等上下文 | 返回最终 Git 结果时由 main.agent 汇总；返回冲突或阻塞时继续确认或分派 |
 | program.main.agent | Main 代码、项目创建、项目信息维护 | 入口类名称、路径、生命周期要求、依赖清单、项目根目录、Unity 版本、目标平台、项目级参数 | 返回最终项目级结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
 | program.entity.agent | Entity 代码、实体建模、实体结构整理 | 实体名称、路径、字段结构、生命周期、依赖对象、配置来源等实体上下文 | 返回最终实体结果时由 main.agent 汇总；返回阻塞时继续补问或分派 |
@@ -47,7 +47,7 @@ main.agent 是两个人与 AI 交互入口之一，也是主编排入口。
 | performance.agent | 性能分析、瓶颈定位、优化建议输出 | 目标模块或文件、性能症状、平台环境、预算、Profiler 或日志线索等上下文 | 返回最终分析结果时由 main.agent 汇总；返回阻塞时继续补问 |
 | style-review.agent | 代码风格审查、一致性检查、可读性规则校验，以及在明确允许时直接修正风格问题 | 目标文件或代码片段、审查范围、风格约束、忽略规则、是否允许落地修改等上下文 | 返回最终审查结果或修正结果时由 main.agent 汇总；返回阻塞时继续补问 |
 | bootstrap.agent | 新增或修改 agent / skill，并在每次人机交互中归纳可改进项后向用户问询确认 | 用户目标、当前轮交互内容、候选改进项、已确认的处理范围 | 返回最终 bootstrap 结果时由 main.agent 汇总；返回待确认态时由 main.agent 继续向用户问询 |
-| turnover.agent | 记录一次人机交互中的原始输入与原始输出 | 原始输入、原始输出、当前日期 | 完成记录后由 main.agent 返回当前轮结果；若记录失败，由 main.agent 在最终输出中说明状态 |
+| turnover.agent | 在用户工程目录 /AI-User/log/ 记录一次人机交互中的输入与输出 | 输入、输出、当前日期、当前时间、用户工程根目录 | 完成记录后由 main.agent 返回当前轮结果；若记录失败，由 main.agent 在最终输出中说明状态 |
 
 ## 调用的 skill 清单
 
@@ -86,7 +86,7 @@ main(input) {
   if (milestoneResult.isBlocked) {
     // 若 `milestone.agent` 判断信息不足，则 `main.agent` 需要先向用户补问，再继续后续编排。
     var blockedOutput = askUserForMissingInfo(milestoneResult)
-    turnover.agent({ rawInput: input, rawOutput: blockedOutput, currentDate: today() })
+    turnover.agent({ rawInput: input, rawOutput: blockedOutput, currentDate: today(), currentTime: now(), userProjectRoot: input.userProjectRoot })
     return blockedOutput
   }
 
@@ -160,13 +160,13 @@ main(input) {
     finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
   }
 
-  // `turnover.agent` 只负责原样追加记录原始输入与原始输出，且不能读取日志文件。
+  // `turnover.agent` 只负责原样追加记录输入与输出到用户工程目录 `/AI-User/log/`，且不能读取日志文件。
   // Output 必须同时可面向用户与面向调用它的 AI：
   // 面向用户时，需要说明任务进度、是否已调用子 agent、是否需要补充信息、是否已产生文件结果，以及最终总结；
   // 面向 AI 时，需要明确当前状态、已调用哪些 agent、各 agent 输出摘要、哪些输出仍是中间结果、
   // 下一步应该交给哪个 agent、以及是否已经形成最终结果。
   // Output 必须简洁、明确、可用于继续推进流程，不能只给笼统结论。
-  turnover.agent(input, finalResult)
+  turnover.agent({ rawInput: input, rawOutput: finalResult, currentDate: today(), currentTime: now(), userProjectRoot: input.userProjectRoot })
   return finalResult
 }
 ```
@@ -211,7 +211,8 @@ main(input) {
 - style-review.agent 不参与 route，而是在 performance.agent 处理完成后才允许介入。
 - style-review.agent 与对应 skill 可以直接修改代码文件，但修改范围只限风格与可读性问题。
 - bootstrap.agent 不参与 route，而是在 style-review.agent 之后、turnover.agent 之前才允许介入。
-- 在向用户返回当前轮输出前，必须委派 turnover.agent 追加记录原始输入与原始输出。
+- 在向用户返回当前轮输出前，必须委派 turnover.agent 向用户工程目录 /AI-User/log/ 追加记录输入与输出。
+- 若用户工程根目录不明确，main.agent 不得调用 turnover.agent 写日志，必须先补齐该信息。
 
 ## 质量标准
 
@@ -250,6 +251,7 @@ main(input) {
 - 能在首次得到 `finalResult` 后才调用 performance.agent
 - 能在 performance.agent 处理完成后才调用 style-review.agent
 - 能让 style-review.agent 与对应 skill 直接落地风格修正，并限制其修改范围只覆盖风格与可读性问题
-- 能在返回当前轮结果前正确调用 turnover.agent 追加记录原始输入与原始输出
+- 能在返回当前轮结果前正确调用 turnover.agent 向用户工程目录 /AI-User/log/ 追加记录输入与输出
+- 能在用户工程根目录缺失时阻止 turnover.agent 写日志并先请求补充
 - 能在需要 shell 时优先使用 `cmd`，并仅在必要时切换到 PowerShell
 - 能阻止未确认 header 的编辑
