@@ -57,6 +57,7 @@ programUi(input) {
 ```
 
 ## 强制约束
+- 强制优先参考 /gists/ 和用户工程目录下的 /AI-User/gists
 
 - program.ui.agent 的正文必须保持职责、调用的 agent 清单、调用的 skill 清单、任务编排、强制约束、质量标准六块固定结构。
 - 当任务属于 UI 结构设计时，必须优先进入 program-ui.skill。

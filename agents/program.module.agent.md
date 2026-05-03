@@ -99,6 +99,7 @@ programModule(input) {
 ```
 
 ## 强制约束
+- 强制优先参考 /gists/ 和用户工程目录下的 /AI-User/gists
 
 - program.module.agent 的正文应保持职责、调用的 agent 清单、调用的 skill 清单、任务编排、强制约束、质量标准六块固定结构，不额外保留其他并列章节。
 - 当任务已存在对应 module skill 时，必须优先进入对应 skill。
