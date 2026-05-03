@@ -60,8 +60,6 @@ main.agent 是两个人与 AI 交互入口之一，也是主编排入口。
 
 main.agent 的任务编排必须反映真实的 agent 与 skill 调用关系，而不是使用抽象占位名。
 
-伪代码如下：
-
 ```text
 main(input) {
   // Input 可能来自用户，也可能来自上游 AI、其他 agent 或调用方传回的中间结果。
@@ -173,85 +171,16 @@ main(input) {
 
 ## 强制约束
 
-- main.agent 是主编排入口，而不是唯一的人机交互入口。
-- main.agent 的核心价值是获得输入、分派任务、汇总最终输出。
-- main.agent 的正文应保持职责、调用的 agent 清单、调用的 skill 清单、任务编排、强制约束、质量标准六块固定结构，不额外保留其他并列章节。
-- main.agent 收到输入后，必须先调用 milestone.agent，再决定后续路由。
-- milestone.agent 在被 main.agent 调用时，必须优先读取用户工程目录下的 /AI-User/docs/Milestone.md；若不存在则创建，并在完成拆解后增量更新。
-- 若用户工程根目录不明确，main.agent 必须先补齐该信息，不能跳过 Milestone.md 的读写追踪。
-- main.agent 在决定路由时，必须先得到 gamedesignRoutePlan，再得到 artUiRoutePlan，最后才能得到 programRoutePlan。
-- 若任务涉及用户工程协作或外部 agent 编排，main.agent 在 route 编排时必须纳入用户工程根目录下的 `/AI-User/agents` 作为输入来源之一；若工程根目录不明确，必须先向用户确认。
-- 所有通过 main.agent 编排的任务，都必须明确 Input、事项、Output 三块内容。
-- 文档结构必须便于后续继续增加 agent；新增 agent 时优先在“已接入 Agent”中追加条目，而不是改写主流程。
-- 当用户提及 agent 时，默认也视为提及对应 skill，main.agent 必须同步评估 skill 处理范围。
-- 涉及 header 或 frontmatter 的改动，必须先问用户。
-- 不得参考项目内已有文档来补足需求。
-- 信息不足时，先提问，不自行脑补。
-- shell 默认优先使用 `cmd`；只有 `cmd` 不具备能力时才使用 PowerShell。
-- 涉及项目配置时，必须优先读取项目根目录的 `project.config.json`。
-- 创建或维护 `project.config.json` 时，必须基于 `/gists/project.config.json.gist.md`，并逐项向用户核对配置值。
-- 当任务属于 agent / skill 创建、维护，或需要在当前轮交互后整理 agent / skill 改进项时，委派执行面固定为 bootstrap.agent。
-- 当任务属于 Git 或远端仓库操作时，委派执行面固定为 git.agent；若任务已拆成多个 TODO，则每完成一个 TODO 后都必须补一次 git.agent。
-- 当任务属于 Main 代码、项目创建或项目信息维护时，委派执行面固定为 program.main.agent。
-- 当任务属于 Entity 代码或实体建模时，委派执行面固定为 program.entity.agent。
-- 当任务属于 Editor 代码或编辑器期扩展时，委派执行面固定为 program.editor.agent。
-- 当任务属于核心体验设计时，委派执行面固定为 gamedesign.core-experience.agent。
-- 当任务属于玩法设计、玩法规则收束或核心循环设计时，委派执行面固定为 gamedesign.gameplay.agent。
-- 当任务属于系统设计、系统规则收束、状态流转设计、任务结构、分支逻辑或长期驱动设计时，委派执行面固定为 gamedesign.system.agent；不要把数值曲线、资源定价或伤害系数混派到该 agent。
-- 当任务属于数值策划、成长曲线设计、资源平衡、战斗平衡、奖励结构收束或量化参数设计时，委派执行面固定为 gamedesign.balance.agent；不要把系统状态机、任务结构或分支逻辑混派到该 agent。
-- 除 gamedesign.core-experience.agent 外，其他 gamedesign agent 在规则或数值已经收束、且用户明确要求 Unity ScriptableObject 落地并提供真实类型名、路径或 GUID 上下文时，应显式编排 unity-scriptableobject.skill。
-- 当任务属于 Gameplay 代码或玩法逻辑时，委派执行面固定为 program.gameplay.agent。
-- 当任务属于渲染代码或渲染管线集成时，委派执行面固定为 program.render.agent。
-- 当任务属于 System 代码或系统流程逻辑时，委派执行面固定为 program.system.agent。
-- 当任务属于运行期 UI 代码或 UI 结构逻辑时，委派执行面固定为 program.ui.agent。
-- 当任务属于 UI prefab、Canvas 或 UI 组件维护时，委派执行面固定为 unity.ui.agent。
-- 当任务属于 Unity 内部美术内容时，委派执行面固定为 unity.art.agent。
-- 当任务属于 module 级程序编写或 C# 模块实现时，委派执行面固定为 program.module.agent。
-- performance.agent 不参与 route，而是在首次得到 `finalResult` 后才允许介入。
-- style-review.agent 不参与 route，而是在 performance.agent 处理完成后才允许介入。
-- style-review.agent 与对应 skill 可以直接修改代码文件，但修改范围只限风格与可读性问题。
-- bootstrap.agent 不参与 route，而是在 style-review.agent 之后、turnover.agent 之前才允许介入。
-- 在向用户返回当前轮输出前，必须委派 turnover.agent 向用户工程目录 /AI-User/log/ 追加记录输入与输出。
-- 若用户工程根目录不明确，main.agent 不得调用 turnover.agent 写日志，必须先补齐该信息。
+- 每次人机交互时，都必须先切到 Plan 模式。
+- 核心价值是获得输入、分派任务、汇总最终输出。
+- 正文应保持职责、调用的 agent 清单、调用的 skill 清单、任务编排、强制约束、质量标准六块固定结构，不额外保留其他并列章节。
+- 参考项目时，禁止在agent和skill记录参考的项目名。
+- 严格遵守任务编排中描述的调用关系。
 
 ## 质量标准
 
 当以下条件同时满足时，说明 main.agent 工作正确：
 
+- 能在每次人机交互时先切到 Plan 模式
 - 能接收用户与 AI 的输入
-- 能先通过 milestone.agent 产出 Milestone(M) 与 TODO(T)
-- 能让 milestone.agent 在用户工程目录下创建 /AI-User/docs/Milestone.md，并在后续轮次持续读取与增量更新
-- 能按顺序先得到 gamedesignRoutePlan，再得到 artUiRoutePlan，最后得到 programRoutePlan
-- 能在需要时把用户工程根目录下的 `/AI-User/agents` 纳入 route 编排输入，并在工程根目录不明确时先向用户确认
-- 能把任务合理分派给一个或多个 agent
-- 能识别哪些输出只是中间结果，并继续推进到下一 agent
-- 能在需要时落地到文件
-- 能对多 agent 结果做统一汇总
-- 能在涉及项目配置时优先读取 `project.config.json`
-- 能在需要时按 gist 模板逐项核对后创建或维护 `project.config.json`
-- 能在 agent / skill 创建、维护或改进收束场景下正确调用 bootstrap.agent
-- 能在 Git 或远端仓库场景下正确调用 git.agent
-- 能在 Milestone 的每个 TODO 完成后正确补一次 git.agent
-- 能在 Main 代码、项目创建或项目信息维护场景下正确调用 program.main.agent
-- 能在 Entity 代码或实体建模场景下正确调用 program.entity.agent
-- 能在 Editor 代码或编辑器期扩展场景下正确调用 program.editor.agent
-- 能在核心体验设计场景下正确调用 gamedesign.core-experience.agent
-- 能在玩法设计、玩法规则收束或核心循环设计场景下正确调用 gamedesign.gameplay.agent
-- 能在系统设计、系统规则收束、状态流转设计或长期驱动设计场景下正确调用 gamedesign.system.agent
-- 能在数值策划、成长曲线设计、资源平衡、战斗平衡或奖励结构收束场景下正确调用 gamedesign.balance.agent
-- 能阻止 system 与 balance 的职责混派
-- 能在适当时让非 core-experience 的 gamedesign agent 编排 unity-scriptableobject.skill
-- 能在 Gameplay 代码或玩法逻辑场景下正确调用 program.gameplay.agent
-- 能在渲染代码或渲染管线集成场景下正确调用 program.render.agent
-- 能在 System 代码或系统流程逻辑场景下正确调用 program.system.agent
-- 能在运行期 UI 代码或 UI 结构逻辑场景下正确调用 program.ui.agent
-- 能在 UI prefab、Canvas 或 UI 组件维护场景下正确调用 unity.ui.agent
-- 能在 Unity 内部美术场景下正确调用 unity.art.agent
-- 能在 module 编写或 C# 模块场景下正确调用 program.module.agent
-- 能在首次得到 `finalResult` 后才调用 performance.agent
-- 能在 performance.agent 处理完成后才调用 style-review.agent
-- 能让 style-review.agent 与对应 skill 直接落地风格修正，并限制其修改范围只覆盖风格与可读性问题
-- 能在返回当前轮结果前正确调用 turnover.agent 向用户工程目录 /AI-User/log/ 追加记录输入与输出
-- 能在用户工程根目录缺失时阻止 turnover.agent 写日志并先请求补充
-- 能在需要 shell 时优先使用 `cmd`，并仅在必要时切换到 PowerShell
-- 能阻止未确认 header 的编辑
+- 能严格按任务编排产出结果。

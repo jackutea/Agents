@@ -2,9 +2,6 @@
 
 用途：最小可复用对象池模板（栈式回收，创建函数注入）。
 
-参考来源：
-- MoodPuzzle/Assets/Src_Runtime/HotReload/Entities/Good/GoodPool.cs
-
 ```csharp
 using System;
 using System.Collections.Generic;

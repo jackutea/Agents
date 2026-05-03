@@ -2,9 +2,6 @@
 
 用途：按 UniqueID 管理运行期实体，提供主仓 + 子索引（如 BBCoin）的仓储结构。
 
-参考来源：
-- MoodPuzzle/Assets/Src_Runtime/HotReload/Entities/Good/GoodRepository.cs
-
 ```csharp
 using System;
 using System.Collections.Generic;

@@ -2,9 +2,6 @@
 
 用途：统一依赖容器，集中托管 State / Events / Module / Manager / Repository / Pool / Entity。
 
-参考来源：
-- MoodPuzzle/Assets/Src_Runtime/HotReload/GameContext.cs
-
 ```csharp
 using UnityEngine;
 using UnityEngine.EventSystems;
