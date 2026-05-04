@@ -144,7 +144,8 @@ main(input) {
       results.push(handleDirectTask(route))
     }
 
-    if (isCompletedMilestoneTodo(route, milestoneResult)) {
+    bool wantsToCommit = askUserIfWantsToCommit(route, results)
+    if (wantsToCommit) {
       results.push(git.agent(buildTodoGitRoute(route, milestoneResult)))
     }
   }

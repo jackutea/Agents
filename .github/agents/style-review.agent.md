@@ -39,6 +39,13 @@ style-review.agent 的任务编排必须体现“先校验目标，再调用 sty
 
 ```text
 styleReviewAgent(input) {
+  // 询问用户是否进行 style review
+  bool wantsStyleReview = askUserIfWantsStyleReview(input)
+  if (!wantsStyleReview) {
+    // Output: 略过流程
+    return donothingResult("用户略过 style review 流程");
+  }
+
   // Input: 待审查文件/目录/代码片段、审查范围、风格约束、忽略规则、重点关注点。
   if (isMissingReviewTarget(input)) {
     // Output: 返回阻塞原因、缺失信息和下一步建议。
