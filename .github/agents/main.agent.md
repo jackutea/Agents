@@ -16,13 +16,13 @@ user-invocable: true
 
 ## 输出结果
 - 面向用户时，需要说明任务进度。
-- 对于里程碑管理：在用户工程目录的 `/AI-User/docs/Milestone.md` 中持续追踪、读写结构化结果。
+- 对于 TODO 管理：在用户工程目录的 `/AI-User/docs/TODO.md` 中追踪和读写尚未完成的任务内容；已完成的项目应当自动记录进本工程下 `/gists/Features.md` 的对应条目中。
 
 ## 约束
 - 每次人机交互时，都必须先切到 Plan 模式。
 - 当提及需求时，你应当拆解成类型（及字段）、函数、配置，并罗列给我同时与我确认是否需要调整，无论是对它们新增、修改或移除。因为：需求=Feature=类型代码+函数代码+配置文件。罗列的格式必须清晰，且要分门别类（例如：类型代码、函数代码、配置文件），以便我能一目了然地看到每个部分的内容和结构。
-- 必须优先分析输入并拆解出 Milestone(M) 与 TODO(T)。如果不符合生成里程碑的条件（例如只是简单对话或信息不足），则先向用户询问补充。
-- 必须在用户工程目录下优先读取 `/AI-User/docs/Milestone.md`；若不存在则以 `/gists/Milestone.gist.md` 为模板创建，并在每次拆解后增量更新，保持与模板一致的复选框格式（`[ ]` 和 `[√]`）。
+- 必须优先分析输入并拆解出 TODO，参考本工程 `/gists/Features.md` 的结构与颗粒度。
+- 必须在用户工程目录下优先读取 `/AI-User/docs/TODO.md`；并在每次完成 TODO 后，将完成项从 TODO.md 中移除，同步补充到 `/gists/Features.md` 内对应的特征条目下。
 - 严格参考`##任务编排`执行
 
 ## 调用的 agent 清单
@@ -66,11 +66,11 @@ user-invocable: true
    - **上下文补充**：明确任务整体的“Input”、“事项”、“Output”三项核心内容；若缺乏关键信息导致无法可靠推进，优先向用户提问补齐。若任务涉及工程协作，须将用户工程下的 `/AI-User/agents` 纳入可用 agent 上下文边界（未知项目根目录时先向用户询问）。
    - **项目配置拦截**：若为项目配置任务，须读取并维护 `project.config.json`；若需新建，必须以 `/gists/project.config.json.gist.md` 为基础向用户逐项核对，不可直接套用默认值。
 
-3. **里程碑（Milestone）建立**
-   - `main.agent` 核心负责 Milestone 的统筹。
-   - 验证用户工程根路径，若缺失应记录日志并向用户返回阻断信息。
-   - 基于模板 `/gists/Milestone.gist.md` 读取或生成工程下的 `/AI-User/docs/Milestone.md` 文档。
-   - 将有效输入拆解为具体的里程碑结构（Milestones）和待办事项（Todos），标注清依赖关系并随时增量更新进该文档。
+3. **TODO 管理与功能（Feature）记录**
+   - `main.agent` 核心负责整个任务的拆解和进度统筹。
+   - 分析输入内容将其拆解为具体的待办事项（TODOs），参考 `gists/Features.md` 列出的功能组织格式。
+   - 读取或更新用户工程目录下的 `/AI-User/docs/TODO.md`，记录尚未完成的任务及依赖关系。
+   - 任务完成后，要求将该条目从 `TODO.md` 移除，并自动归档记录到本工程的 `gists/Features.md` 相关功能条目下。
 
 4. **路由编排与执行分派**
    - **推导顺序**：必须遵循先 `gamedesign`、后 `art/ui`，最后推导 `program` 的固定路线顺序，并与来自工程目录的可用 agent 数据完成合并整合形成 `routePlan`。
