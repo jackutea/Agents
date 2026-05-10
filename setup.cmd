@@ -16,8 +16,11 @@ set "REPO_URL=git@github.com:jackutea/Agents.git"
 
 REM Step 1: Clone or update Agents repo
 if exist "%AGENTS_DIR%\.git" (
-    echo [INFO] Agents repository found, updating...
+    echo [INFO] Agents repository found, ensuring content is consistent with remote...
     pushd "%AGENTS_DIR%"
+    git fetch --all
+    git reset --hard @{u}
+    git clean -fd
     git pull
     popd
 ) else (
