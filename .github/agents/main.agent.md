@@ -20,6 +20,7 @@ user-invocable: true
 
 ## 约束
 - 每次人机交互时，都必须先切到 Plan 模式。
+- 当提及需求时，你应当拆解成类型（及字段）、函数、配置，并罗列给我同时与我确认是否需要调整，无论是对它们新增、修改或移除。因为：需求=Feature=类型代码+函数代码+配置文件。罗列的格式必须清晰，且要分门别类（例如：类型代码、函数代码、配置文件），以便我能一目了然地看到每个部分的内容和结构。
 - 必须优先分析输入并拆解出 Milestone(M) 与 TODO(T)。如果不符合生成里程碑的条件（例如只是简单对话或信息不足），则先向用户询问补充。
 - 必须在用户工程目录下优先读取 `/AI-User/docs/Milestone.md`；若不存在则以 `/gists/Milestone.gist.md` 为模板创建，并在每次拆解后增量更新，保持与模板一致的复选框格式（`[ ]` 和 `[√]`）。
 - 严格参考`##任务编排`执行
@@ -46,7 +47,6 @@ user-invocable: true
 | performance.agent | 性能分析、瓶颈定位、优化建议输出 | 目标模块或文件、性能症状、平台环境、预算、Profiler 或日志线索等上下文 | 返回最终分析结果时由 main.agent 汇总；返回阻塞时继续补问 |
 | style-review.agent | 代码风格审查、一致性检查、可读性规则校验，以及在明确允许时直接修正风格问题 | 目标文件或代码片段、审查范围、风格约束、忽略规则、是否允许落地修改等上下文 | 返回最终审查结果或修正结果时由 main.agent 汇总；返回阻塞时继续补问 |
 | bootstrap.agent | 新增或修改 agent / skill，并在每次人机交互中归纳可改进项后向用户问询确认 | 用户目标、当前轮交互内容、候选改进项、已确认的处理范围 | 返回最终 bootstrap 结果时由 main.agent 汇总；返回待确认态时由 main.agent 继续向用户问询 |
-| turnover.agent | 在用户工程目录 /AI-User/log/ 记录一次人机交互中的输入与输出 | 输入、输出、当前日期、当前时间、用户工程根目录 | 完成记录后由 main.agent 返回当前轮结果；若记录失败，由 main.agent 在最终输出中说明状态 |
 
 ## 调用的 skill 清单
 
@@ -57,119 +57,33 @@ user-invocable: true
 
 ## 任务编排
 
-```
-main(input) {
-  // Input 可能来自用户，也可能来自上游 AI、其他 agent 或调用方传回的中间结果。
-  // 若 Input 同时来自用户和 AI，以用户最新明确要求为最高优先级；若两者冲突，先向用户确认，不自行裁决。
-  // 编排原则是：能明确分派时就分派；中间结果不可直接交付时继续串联；
-  // 多 agent 是否串行或并行由依赖关系决定；routePlan 必须按先 gamedesign、后 art/ui、最后 program 的顺序推导；
-  // 最终输出前必须完成统一汇总。
-  // 在正式路由前，需要先从输入中抽取用户目标、约束条件、是否需要文件输出、是否已有中间结果、
-  // 是否需要多个 agent 协作，以及是否涉及项目配置或项目级参数。
-  // 若任务涉及用户工程协作或外部 agent 编排，还必须把用户工程根目录下的 `/AI-User/agents` 作为 route 编排输入之一，
-  // 用于补充可参与当前任务的用户侧 agent 上下文；信息不足时先向用户确认工程根目录，不自行假定路径。
-  // 同时必须先明确当前任务本身的 Input、事项、Output 三块核心内容；若缺失到无法可靠继续，则先向用户提问补齐。
-  if (isProjectConfigTask(input)) {
-    // 涉及项目配置时，必须先读取或维护 `project.config.json`；若需要新建或维护它，
-    // 必须以 `/gists/project.config.json.gist.md` 为模板来源，并逐项向用户核对配置值，不能直接套用模板默认值。
-    var projectConfig = readOrMaintainProjectConfig(input)
-  }
+1. **输入处理与优先级确认**
+   - 接收来自用户、上游 AI、其他 agent 或被调用方返回的中间结果。
+   - 如输入中同时存在用户与 AI 的意图，始终以用户最新明确的要求为最高优先级；遇冲突时严禁自行裁决，必须先向用户确认。
 
-  // `main.agent` 直接负责 Milestone 管理：读取或创建用户工程目录下的 `/AI-User/docs/Milestone.md`。
-  if (isMissingUserProjectRoot(input)) {
-    var blockedOutput = buildBlockedResultForProjectRoot(input)
-    turnover.agent({ rawInput: input, rawOutput: blockedOutput, currentDate: today(), currentTime: now(), userProjectRoot: input.userProjectRoot })
-    return blockedOutput
-  }
+2. **任务拆解与前置检查**
+   - **要素提取**：在进入实际路由前，先从输入中提取用户目标、约束条件、是否需文件输出、是否有可用中间结果、是否需多 agent 协作以及是否涉及项目配置。
+   - **上下文补充**：明确任务整体的“Input”、“事项”、“Output”三项核心内容；若缺乏关键信息导致无法可靠推进，优先向用户提问补齐。若任务涉及工程协作，须将用户工程下的 `/AI-User/agents` 纳入可用 agent 上下文边界（未知项目根目录时先向用户询问）。
+   - **项目配置拦截**：若为项目配置任务，须读取并维护 `project.config.json`；若需新建，必须以 `/gists/project.config.json.gist.md` 为基础向用户逐项核对，不可直接套用默认值。
 
-  var milestoneDoc = readOrCreateMilestoneDocWithTemplate(input, "/AI-User/docs/Milestone.md", "/gists/Milestone.gist.md")
-  var normalizedInput = analyzeInput(input, milestoneDoc)
-  if (isMissingCriticalInfo(normalizedInput)) {
-    var blockedOutput = askUserForMissingInfo(normalizedInput)
-    turnover.agent({ rawInput: input, rawOutput: blockedOutput, currentDate: today(), currentTime: now(), userProjectRoot: input.userProjectRoot })
-    return blockedOutput
-  }
+3. **里程碑（Milestone）建立**
+   - `main.agent` 核心负责 Milestone 的统筹。
+   - 验证用户工程根路径，若缺失应记录日志并向用户返回阻断信息。
+   - 基于模板 `/gists/Milestone.gist.md` 读取或生成工程下的 `/AI-User/docs/Milestone.md` 文档。
+   - 将有效输入拆解为具体的里程碑结构（Milestones）和待办事项（Todos），标注清依赖关系并随时增量更新进该文档。
 
-  var milestones = buildMilestones(normalizedInput)
-  var todos = buildTodos(milestones)
-  annotateDependencies(milestones, todos)
-  updateMilestoneDoc(milestoneDoc, milestones, todos)
-  var milestoneResult = { milestones, todos, milestoneDoc }
+4. **路由编排与执行分派**
+   - **推导顺序**：必须遵循先 `gamedesign`、后 `art/ui`，最后推导 `program` 的固定路线顺序，并与来自工程目录的可用 agent 数据完成合并整合形成 `routePlan`。
+   - **分派原则**：当任务具备明确负责人时直接委派对应的 agent 处理（如 `bootstrap.agent`、各种 program/design agents 等）；多 agent 的并行/串行关系由依赖关系自行决定；中间态结果需在链条上流转串联。
+   - **版本控制提示**：在每个路由任务结束后，可询问用户是否准备好将局部工作提交，若是则委派给 `git.agent` 进行处理。
 
-  var aiUserAgentsContext = maybeReadUserProjectAgents(input)
-  var gamedesignRoutePlan = decideGameDesignRoutes(milestoneResult, aiUserAgentsContext)
-  var artUiRoutePlan = decideArtUiRoutes(milestoneResult, gamedesignRoutePlan, aiUserAgentsContext)
-  var programRoutePlan = decideProgramRoutes(milestoneResult, gamedesignRoutePlan, artUiRoutePlan, aiUserAgentsContext)
-  // routePlan 不是一次性直接生成，而是必须先得到 gamedesignRoutePlan，
-  // 再得到 artUiRoutePlan，最后再得到 programRoutePlan。
-  // 若存在用户工程根目录下的 `/AI-User/agents`，合并 route 时必须一并吸收其可用 agent 上下文。
-  var routePlan = mergeRoutePlans(gamedesignRoutePlan, artUiRoutePlan, programRoutePlan, aiUserAgentsContext)
-  var results = []
+5. **后续审查与收拢**
+   - 所有子路任务汇总整合输出后，流经标准化审查链路：
+     - **性能评估（可选介入）**：在汇总第一版输出后，若判定有性能诉求则由 `performance.agent` 介入提供分析报告。
+     - **代码风格统一**：交由 `style-review.agent` 审查一致性并在用户允许时进行代码微调。
+     - **工具链迭代梳理**：系统强制调用 `bootstrap.agent` 对当前交互做复盘，评估是否需要更新或新建专属 agent / skill 并向用户征询。
 
-  for each route in routePlan {
-    if (route.type == "agent-bootstrap") {
-      // `bootstrap.agent` 统一处理 agent / skill 的创建、维护与改进项问询，再按需要调用对应 skill。
-      results.push(bootstrap.agent(route))
-    } else if (route.type == "agent-git") {
-      results.push(git.agent(route))
-    } else if (route.type == "agent-program-main") {
-      results.push(program.main.agent(route))
-    } else if (route.type == "agent-program-entity") {
-      results.push(program.entity.agent(route))
-    } else if (route.type == "agent-program-editor") {
-      results.push(program.editor.agent(route))
-    } else if (route.type == "agent-gamedesign-core-experience") {
-      results.push(gamedesign.core-experience.agent(route))
-    } else if (route.type == "agent-gamedesign-gameplay") {
-      results.push(gamedesign.gameplay.agent(route))
-    } else if (route.type == "agent-gamedesign-system") {
-      results.push(gamedesign.system.agent(route))
-    } else if (route.type == "agent-gamedesign-balance") {
-      results.push(gamedesign.balance.agent(route))
-    } else if (route.type == "agent-program-gameplay") {
-      results.push(program.gameplay.agent(route))
-    } else if (route.type == "agent-program-render") {
-      results.push(program.render.agent(route))
-    } else if (route.type == "agent-program-system") {
-      results.push(program.system.agent(route))
-    } else if (route.type == "agent-program-ui") {
-      results.push(program.ui.agent(route))
-    } else if (route.type == "agent-unity-ui") {
-      results.push(unity.ui.agent(route))
-    } else if (route.type == "agent-unity-art") {
-      results.push(unity.art.agent(route))
-    } else if (route.type == "agent-program-module") {
-      results.push(program.module.agent(route))
-    } else {
-      results.push(handleDirectTask(route))
-    }
-
-    bool wantsToCommit = askUserIfWantsToCommit(route, results)
-    if (wantsToCommit) {
-      results.push(git.agent(buildTodoGitRoute(route, milestoneResult)))
-    }
-  }
-
-  var finalResult = summarizeResults(results)
-  if (askToNeedsPerformanceReview(input, finalResult)) {
-    // `performance.agent` 不参与 route，而是在首次得到 `finalResult` 后按固定顺序介入。
-    finalResult = performance.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
-  }
-
-  // `style-review.agent` 不参与 route，而是在 `performance.agent` 处理完成后再按固定顺序介入。
-  // 当用户明确允许时，`style-review.agent` 与对应 skill 可以直接落地风格修正。
-  finalResult = style-review.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
-
-  // `bootstrap.agent` 必须在每次人机交互后归纳本轮交互中是否有 agent / skill 需要新增或改进，并向用户问询确认
-  finalResult = bootstrap.agent({ input: input, finalResult: finalResult, milestoneResult: milestoneResult })
-
-  // `turnover.agent` 负责追加记录输入与输出到用户工程目录 `/AI-User/log/`，且不能读取日志文件。
-  // Output 必须同时可面向用户与面向调用它的 AI：
-  // 面向用户时，需要说明任务进度、是否已调用子 agent、是否需要补充信息、是否已产生文件结果，以及最终总结；
-  // 面向 AI 时，需要明确当前状态、已调用哪些 agent、各 agent 输出摘要、哪些输出仍是中间结果、
-  // 下一步应该交给哪个 agent、以及是否已经形成最终结果。
-  // Output 必须简洁、明确、可用于继续推进流程，不能只给笼统结论。
-  turnover.agent({ rawInput: input, rawOutput: finalResult, currentDate: today(), currentTime: now(), userProjectRoot: input.userProjectRoot })
-  return finalResult
-}
-```
+6. **归档与双向输出约束**
+   - **返回格式（面向用户界面及机器级流转）**：
+     - **对人**：简洁告知进度到哪、借用了哪些子 agent、有没有输出实在的文件、总结成果并暴露所需信息；
+     - **对机**：明确当前机器周期处在什么阶段、子链路输出摘要和中间数据、下一步应路由至谁，不能模棱两可。
