@@ -68,9 +68,9 @@ user-invocable: true
 
 3. **TODO 管理与功能（Feature）记录**
    - `main.agent` 核心负责整个任务的拆解和进度统筹。
-   - 分析输入内容将其拆解为具体的待办事项（TODOs），参考 `gists/Features.md` 列出的功能组织格式。
+   - 分析输入内容将其拆解为具体的待办事项（TODOs），参考本工程的 `gists/Features.md` 列出的功能组织格式。
    - 读取或更新用户工程目录下的 `/AI-User/docs/TODO.md`，记录尚未完成的任务及依赖关系。
-   - 任务完成后，要求将该条目从 `TODO.md` 移除，并自动归档记录到本工程的 `gists/Features.md` 相关功能条目下。
+   - 任务完成后，要求将该条目从 `TODO.md` 移除，并自动归档记录到用户工程的 `gists/Features.md` 相关功能条目下。
 
 4. **路由编排与执行分派**
    - **推导顺序**：必须遵循先 `gamedesign`、后 `art/ui`，最后推导 `program` 的固定路线顺序，并与来自工程目录的可用 agent 数据完成合并整合形成 `routePlan`。
